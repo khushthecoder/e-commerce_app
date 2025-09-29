@@ -1,20 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// In your root App.js
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import AppNavigation from './src/Navigation/AppNavigation'; // Corrected path
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>VISHAL_MART</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <AppNavigation />
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
