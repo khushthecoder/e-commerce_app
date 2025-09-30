@@ -1,27 +1,21 @@
-# Node / Dependencies
-# -----------------------------------------------------------------------------
+
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 package-lock.json
 
-# Environment Variables & Secrets
-# NEVER commit your secrets!
-# -----------------------------------------------------------------------------
+
 .env
 .env.*
 *.keystore
 
-# Google/Firebase Services configuration files
-# Best practice is to not commit these to a public repo.
-# See the note below for more details.
+
 google-services.json
 GoogleService-Info.plist
 
 
-# Expo / React Native
-# -----------------------------------------------------------------------------
+
 .expo/
 .expo-shared/
 web-build/
@@ -30,8 +24,7 @@ yarn-debug.log*
 yarn-error.log*
 
 
-# Build output
-# -----------------------------------------------------------------------------
+
 build/
 dist/
 *.apk
@@ -40,16 +33,14 @@ dist/
 *.cer
 
 
-# macOS / OS-specific files
-# -----------------------------------------------------------------------------
+
 .DS_Store
 .AppleDouble
 .LSOverride
 Thumbs.db
 
 
-# Editor directories and files
-# -----------------------------------------------------------------------------
+
 .idea/
 .vscode/
 *.suo
@@ -58,8 +49,7 @@ Thumbs.db
 *.sln.docstates
 
 
-# Logs
-# -----------------------------------------------------------------------------
+
 logs
 *.log
 npm-debug.log*
