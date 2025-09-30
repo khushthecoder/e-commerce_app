@@ -1,10 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet, FlatList, Text } from 'react-native';
+import ProductCard from '../../components/product/productcard';
+import { products } from '../../constants/dummyData';
 
 const HomeScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Home Screen</Text>
+      <FlatList
+        data={products}
+        renderItem={({ item }) => <ProductCard product={item} />}
+        keyExtractor={(item) => item.id}
+        numColumns={2} 
+        contentContainerStyle={styles.list}
+      />
     </View>
   );
 };
@@ -12,13 +20,11 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#f5f5f5', 
   },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  }
+  list: {
+    paddingHorizontal: 8,
+  },
 });
 
 export default HomeScreen;
