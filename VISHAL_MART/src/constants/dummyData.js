@@ -1,38 +1,74 @@
-export const products = [
-  {
-    id: '1',
-    name: 'Classic White T-Shirt',
-    price: '₹799',
-    image: 'https://picsum.photos/seed/1/400',
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, FlatList, Text, ActivityIndicator } from 'react-native';
+import axios from 'axios';
+import ProductCard from '../../components/product/ProductCard';
+
+
+const API_URL = 'https://dummyjson.com/products';
+
+const HomeScreen = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(API_URL);
+        setProducts(response.data.products);
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text>Error fetching data: {error}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={products}
+        renderItem={({ item }) => <ProductCard product={item} />}
+        // CHANGE 3: Key ko hamesha string mein hona chahiye
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+        contentContainerStyle={styles.list}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
   },
-  {
-    id: '2',
-    name: 'Denim Blue Jeans',
-    price: '₹1,999',
-    image: 'https://picsum.photos/seed/2/400',
+  list: {
+    paddingHorizontal: 8,
   },
-  {
-    id: '3',
-    name: 'Leather Biker Jacket',
-    price: '₹4,500',
-    image: 'https://picsum.photos/seed/3/400',
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  {
-    id: '4',
-    name: 'Running Sports Shoes',
-    price: '₹2,250',
-    image: 'https://picsum.photos/seed/4/400',
-  },
-  {
-    id: '5',
-    name: 'Analog Wrist Watch',
-    price: '₹3,100',
-    image: 'https://picsum.photos/seed/5/400',
-  },
-  {
-    id: '6',
-    name: 'Stylish Black Sunglasses',
-    price: '₹1,200',
-    image: 'https://picsum.photos/seed/6/400',
-  },
-];
+});
+
+export default HomeScreen;
