@@ -21,7 +21,8 @@ model Product {
   title       String
   description String
   price       Float
-  thumbnail   String
+  thumbnail   String     // Thumbnail/Main image ka URL (mandatory)
+  imageUrl    String?    // Detailed image ka URL (optional)
   category    String
-  stock       Int      @default(0) 
+  stock       Int      @default(0)
 }

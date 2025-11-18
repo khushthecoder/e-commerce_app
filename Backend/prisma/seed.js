@@ -2,28 +2,42 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Start seeding ...');
+  console.log('Start seeding products...');
 
-  await prisma.product.deleteMany();
+  const product1 = await prisma.product.create({
+    data: {
+      title: 'Men\'s Running Shoes',
+      description: 'Comfortable and lightweight shoes for daily running.',
+      price: 2499.00,
+      stock: 50,
+      imageUrl: 'https://example.com/images/shoe.jpg',
+      thumbnail: 'https://example.com/images/shoe_thumb.jpg',
+      category: 'Footwear',
+    },
+  });
 
-  const response = await fetch('https://dummyjson.com/products?limit=20');
-  const { products } = await response.json();
+  const product2 = await prisma.product.create({
+    data: {
+      title: 'Wireless Bluetooth Headphones',
+      description: 'High-quality sound with 20 hours battery backup.',
+      price: 1899.50,
+      stock: 120,
+      imageUrl: 'https://example.com/images/headphone.jpg',
+      thumbnail: 'https://example.com/images/headphone_thumb.jpg',
+      category: 'Electronics',
+    },
+  });
 
-  for (const p of products) {
-    await prisma.product.create({
-      data: {
-        title: p.title,
-        description: p.description,
-        price: p.price,
-        thumbnail: p.thumbnail,
-        category: p.category,
-        stock: p.stock,
-      },
-    });
-  }
-  console.log('Seeding finished.');
+  console.log(`Created product: ${product1.title}`);
+  console.log(`Created product: ${product2.title}`);
+  console.log('Product seeding finished.');
 }
 
 main()
-  .catch((e) => console.error(e))
-  .finally(async () => await prisma.$disconnect());
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
