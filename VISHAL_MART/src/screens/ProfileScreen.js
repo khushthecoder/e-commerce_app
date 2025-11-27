@@ -5,8 +5,8 @@ import Container from '../components/layout/container';
 import { useAuth } from '../state/authContext'; 
 
 const ProfileScreen = ({ navigation }) => {
-  const { authState, signOutUser } = useAuth();
-  const user = authState.user; 
+  const { userToken, logout } = useAuth();
+  const isAuthenticated = !!userToken;
 
   const handleLogout = async () => {
     Alert.alert(
@@ -21,7 +21,7 @@ const ProfileScreen = ({ navigation }) => {
           text: 'Logout',
           onPress: async () => {
             try {
-              await signOutUser();
+              await logout();
             } catch (e) {
               Alert.alert('Error', 'There was a problem logging out.');
               console.error('Logout Error:', e);
@@ -72,10 +72,10 @@ const ProfileScreen = ({ navigation }) => {
       <View style={styles.userInfoCard}>
         <MaterialIcons name="account-circle" size={60} color="#007AFF" />
         <View style={styles.userInfoDetails}>
-          {user ? (
+          {isAuthenticated ? (
             <>
-              <Text style={styles.userName}>{user.email || 'Authenticated User'}</Text>
-              <Text style={styles.userIdText}>User ID: {user.uid}</Text>
+              <Text style={styles.userName}>Welcome User</Text>
+              <Text style={styles.userIdText}>You are logged in</Text>
             </>
           ) : (
             <Text style={styles.userName}>Welcome Guest</Text>
@@ -95,7 +95,7 @@ const ProfileScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.logoutButtonContainer}>
-        {user ? (
+        {isAuthenticated ? (
           <Button
             title="Log Out"
             onPress={handleLogout}
@@ -104,7 +104,7 @@ const ProfileScreen = ({ navigation }) => {
         ) : (
           <Button
             title="Login / Signup"
-            onPress={() => navigation.navigate('LoginScreen')} 
+            onPress={() => navigation.navigate('Login')} 
             color="#007AFF"
           />
         )}
