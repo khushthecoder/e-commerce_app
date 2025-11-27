@@ -1,30 +1,31 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
-import { register, login } from '../Utils/authService';
+import { useAuth } from '../state/authContext';
 
 export default function DebugAuthScreen() {
   const [name, setName] = useState('Test User');
   const [email, setEmail] = useState('test@example.com');
   const [password, setPassword] = useState('password123');
   const [output, setOutput] = useState('');
+  const { register, login } = useAuth();
 
   const doRegister = async () => {
     setOutput('Sending register...');
     try {
-      const res = await register({ name, email, password });
-      setOutput(JSON.stringify(res, null, 2));
+      await register(name, email, password);
+      setOutput('Registered successfully');
     } catch (err) {
-      setOutput('Register error:\n' + JSON.stringify(err.response?.data || err.message || err, null, 2));
+      setOutput('Register error:\n' + JSON.stringify(err.message || err, null, 2));
     }
   };
 
   const doLogin = async () => {
     setOutput('Sending login...');
     try {
-      const res = await login({ email, password });
-      setOutput(JSON.stringify(res, null, 2));
+      await login(email, password);
+      setOutput('Logged in successfully');
     } catch (err) {
-      setOutput('Login error:\n' + JSON.stringify(err.response?.data || err.message || err, null, 2));
+      setOutput('Login error:\n' + JSON.stringify(err.message || err, null, 2));
     }
   };
 

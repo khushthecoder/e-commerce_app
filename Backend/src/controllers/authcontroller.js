@@ -111,7 +111,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
     await prisma.passwordResetToken.create({ data: { userId: user.id, tokenHash, expiresAt } });
 
-    const clientUrl = process.env.CLIENT_URL || 'http:
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
     const resetLink = `${clientUrl}/reset-password?token=${token}&id=${user.id}`;
 
     try {

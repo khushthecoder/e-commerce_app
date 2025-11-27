@@ -8,7 +8,7 @@ const SignupScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signUp, isLoading } = useAuth();
+  const { register, isLoading } = useAuth();
 
   const onRegister = async () => {
     if (!name || !email || !password) {
@@ -16,8 +16,8 @@ const SignupScreen = ({ navigation }) => {
     }
 
     try {
-      await signUp(name, email, password);
-      
+      await register(name, email, password);
+
     } catch (error) {
       console.error(error);
       Alert.alert('Error', error.message || 'Registration failed.');

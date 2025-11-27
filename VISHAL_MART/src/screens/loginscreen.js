@@ -7,7 +7,7 @@ import Container from '../components/layout/container';
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signIn, isLoading } = useAuth();
+  const { login, isLoading } = useAuth();
 
   const onLogin = async () => {
     if (!email || !password) {
@@ -15,8 +15,8 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      await signIn(email, password);
-      
+      await login(email, password);
+
     } catch (error) {
       console.error('Login Error:', error);
       Alert.alert('Error', error.message || 'Login failed. Invalid credentials or server error.');

@@ -25,10 +25,10 @@ export const AuthProvider = ({ children }) => {
 
   const authContext = useMemo(
     () => ({
-      signIn: async (email, password) => {
+      login: async (email, password) => {
         setIsLoading(true);
         try {
-          const response = await api.post('/users/login', { email, password });
+          const response = await api.post('/api/users/login', { email, password });
           const { token } = response.data;
 
           await AsyncStorage.setItem('userToken', token);
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
           throw new Error(error.response?.data?.error || 'Login failed');
         }
       },
-      signOut: async () => {
+      logout: async () => {
         setIsLoading(true);
         try {
           await AsyncStorage.removeItem('userToken');
@@ -51,11 +51,11 @@ export const AuthProvider = ({ children }) => {
           setIsLoading(false);
         }
       },
-      signUp: async (name, email, password) => {
+      register: async (name, email, password) => {
         setIsLoading(true);
         try {
-          await api.post('/users/register', { name, email, password });
-          await authContext.signIn(email, password);
+          await api.post('/api/users/register', { name, email, password });
+          await authContext.login(email, password);
         } catch (error) {
           setIsLoading(false);
           console.error('Sign up error:', error.response?.data?.error || 'Signup failed');
