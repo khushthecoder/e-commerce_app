@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, Button, Alert } from 'react-native';
-import { fetchProducts } from '../Utils/productService'; 
-import { logout } from '../Utils/authService';
+import api from '../constants/api';
+import { useAuth } from '../state/authContext';
 import ProductCard from '../components/product/Productcard';
 
 const HomeScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { signOut } = useAuth();
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const data = await fetchProducts();
-        setProducts(data);
+        const response = await api.get('/products');
+        setProducts(response.data);
       } catch (err) {
         console.error("Product fetch error:", err);
         setError('Unable to load products. Please check the server.');
@@ -26,8 +27,8 @@ const HomeScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
-      await logout();
-      navigation.navigate('Login');
+      await signOut();
+      
     } catch (e) {
       Alert.alert('Error', 'There was an issue logging out.');
       console.error('Logout Error:', e);

@@ -4,7 +4,7 @@ import axios from 'axios';
 import ProductCard from '../../components/product/ProductCard';
 
 
-const API_URL = 'https://dummyjson.com/products';
+const API_URL = 'https:
 
 const HomeScreen = () => {
   const [products, setProducts] = useState([]);
@@ -47,7 +47,7 @@ const HomeScreen = () => {
       <FlatList
         data={products}
         renderItem={({ item }) => <ProductCard product={item} />}
-        // CHANGE 3: Key ko hamesha string mein hona chahiye
+        
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
         contentContainerStyle={styles.list}

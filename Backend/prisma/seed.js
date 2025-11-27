@@ -10,8 +10,8 @@ async function main() {
       description: 'Comfortable and lightweight shoes for daily running.',
       price: 2499.00,
       stock: 50,
-      imageUrl: 'https://example.com/images/shoe.jpg',
-      thumbnail: 'https://example.com/images/shoe_thumb.jpg',
+      imageUrl: 'https:
+      thumbnail: 'https:
       category: 'Footwear',
     },
   });
@@ -22,8 +22,8 @@ async function main() {
       description: 'High-quality sound with 20 hours battery backup.',
       price: 1899.50,
       stock: 120,
-      imageUrl: 'https://example.com/images/headphone.jpg',
-      thumbnail: 'https://example.com/images/headphone_thumb.jpg',
+      imageUrl: 'https:
+      thumbnail: 'https:
       category: 'Electronics',
     },
   });

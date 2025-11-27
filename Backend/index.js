@@ -1,13 +1,22 @@
+require('dotenv').config();
+const { EventEmitter } = require('events');
+EventEmitter.defaultMaxListeners = 20;
 const express = require('express');
 const cors = require('cors');
-const productRoutes = require('./src/routes/productRoutes.js');
+const productRoutes = require('./src/routes/productroutes.js');
+const authRoutes = require('./src/routes/authroutes.js'); 
+const cartRoutes = require('./src/routes/cartroutes.js');
+const orderRoutes = require('./src/routes/orderroutes.js');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use('/api/products', productRoutes); 
+app.use('/api/products', productRoutes);
+app.use('/api/users', authRoutes); 
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http:
 });

@@ -28,7 +28,7 @@ const ProductDetailScreen = ({ route }) => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image 
           style={styles.productImage} 
-          source={{ uri: product.imageUrl || 'https://placehold.co/600x400/007AFF/ffffff?text=Image+Nahi+Mili' }} 
+          source={{ uri: product.imageUrl || 'https:
         />
         
         <View style={styles.detailsContainer}>

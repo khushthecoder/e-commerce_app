@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "import-products": "node scripts/importProducts.js",
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:seed": "node seed.js",
     "prisma:generate": "prisma generate"
@@ -22,7 +23,9 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.10.1",
     "prisma": "^6.16.3"
   }
 }

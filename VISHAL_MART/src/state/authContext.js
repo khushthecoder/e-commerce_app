@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useState, useEffect, useMemo, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../constants/api'; 
+import api from '../constants/api';
 
 export const AuthContext = createContext();
 
@@ -28,9 +28,9 @@ export const AuthProvider = ({ children }) => {
       signIn: async (email, password) => {
         setIsLoading(true);
         try {
-          const response = await api.post('/auth/login', { email, password });
+          const response = await api.post('/users/login', { email, password });
           const { token } = response.data;
-          
+
           await AsyncStorage.setItem('userToken', token);
           setUserToken(token);
           setIsLoading(false);
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
       signUp: async (name, email, password) => {
         setIsLoading(true);
         try {
-          await api.post('/auth/signup', { name, email, password });
+          await api.post('/users/register', { name, email, password });
           await authContext.signIn(email, password);
         } catch (error) {
           setIsLoading(false);
@@ -73,4 +73,8 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  return useContext(AuthContext);
 };

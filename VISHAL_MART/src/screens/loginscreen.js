@@ -1,32 +1,25 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Button, Alert, ActivityIndicator } from 'react-native';
-import { login } from '../Utils/authService';
+import { useAuth } from '../state/authContext';
 import InputField from '../components/common/inputfield';
 import Container from '../components/layout/container';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { signIn, isLoading } = useAuth();
 
   const onLogin = async () => {
     if (!email || !password) {
       return Alert.alert('Error', 'Please enter email and password.');
     }
-    
-    setLoading(true);
+
     try {
-      const userData = { email, password };
-      const result = await login(userData);
-      
-      Alert.alert('Success', `Welcome back, ${result.name}!`);
-      navigation.navigate('Home');
+      await signIn(email, password);
       
     } catch (error) {
-      console.error('Login Error:', error.response?.data);
-      Alert.alert('Error', error.response?.data?.message || 'Login failed. Invalid credentials or server error.');
-    } finally {
-      setLoading(false);
+      console.error('Login Error:', error);
+      Alert.alert('Error', error.message || 'Login failed. Invalid credentials or server error.');
     }
   };
 
@@ -35,35 +28,35 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.content}>
         <Text style={styles.header}>Welcome Back</Text>
 
-        <InputField 
+        <InputField
           placeholder="Email Address"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
         />
 
-        <InputField 
+        <InputField
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
-        
+
         <View style={styles.buttonContainer}>
-          <Button 
-            title={loading ? 'Logging In...' : 'Log In'}
+          <Button
+            title={isLoading ? 'Logging In...' : 'Log In'}
             onPress={onLogin}
-            disabled={loading}
+            disabled={isLoading}
             color="#007AFF"
           />
         </View>
 
-        <Text style={styles.signupText} onPress={() => navigation.navigate('Signup')}>
+        <Text style={styles.signupText} onPress={() => navigation.navigate('SignUp')}>
           Don't have an account? Sign Up.
         </Text>
       </View>
 
-      {loading && (
+      {isLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#007AFF" />
         </View>
