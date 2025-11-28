@@ -11,17 +11,41 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import LoginScreen from './src/screens/loginscreen';
 import SignUpScreen from './src/screens/signupscreen';
 import DebugAuthScreen from './src/screens/DebugAuthScreen';
+import ProductDetailScreen from './src/screens/ProductDetailScreen';
+import CheckoutScreen from './src/screens/CheckoutScreen';
 import { AuthProvider, useAuth } from './src/state/authContext';
 import { CartProvider } from './src/state/cartContext';
 
 const Tab = createBottomTabNavigator();
 const AuthStackScreen = createStackNavigator();
 
+const HomeStack = createStackNavigator();
+
+const HomeStackNavigator = () => {
+  return (
+    <HomeStack.Navigator>
+      <HomeStack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
+      <HomeStack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: 'Product Details' }} />
+    </HomeStack.Navigator>
+  );
+};
+
+const CartStack = createStackNavigator();
+
+const CartStackNavigator = () => {
+  return (
+    <CartStack.Navigator>
+      <CartStack.Screen name="CartScreen" component={CartScreen} options={{ headerShown: false }} />
+      <CartStack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Checkout' }} />
+    </CartStack.Navigator>
+  );
+};
+
 const MainTabNavigator = () => {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Cart" component={CartScreen} />
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen name="Home" component={HomeStackNavigator} />
+      <Tab.Screen name="Cart" component={CartStackNavigator} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
@@ -31,14 +55,14 @@ const AuthStack = () => {
   return (
     <AuthStackScreen.Navigator screenOptions={{ headerShown: false }}>
       <AuthStackScreen.Screen name="Login" component={LoginScreen} />
-      <AuthStackScreen.Screen name="SignUp" component={SignUpScreen} />
+      <AuthStackScreen.Screen name="Register" component={SignUpScreen} />
       <AuthStackScreen.Screen name="DebugAuth" component={DebugAuthScreen} />
     </AuthStackScreen.Navigator>
   );
 };
 
 const AppNavigation = () => {
-  const { userToken, isLoading } = useAuth(); 
+  const { userToken, isLoading } = useAuth();
 
   if (isLoading) {
     return (

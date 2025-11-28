@@ -1,37 +1,22 @@
+// backend/middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
-const asyncHandler = require('express-async-handler');
-const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient();
+const protect = (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
 
-const protect = asyncHandler(async (req, res, next) => {
-    let token;
-
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        try {
-            token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-            req.user = await prisma.user.findUnique({
-                where: { id: decoded.id },
-                select: { id: true, email: true, name: true, isAdmin: true }
-            });
-
-            if (!req.user) {
-                res.status(401);
-                throw new Error('User not found');
-            }
-
-            next();
-        } catch (error) {
-            console.error(error);
-            res.status(401);
-            throw new Error('Not authorized, token failed');
-        }
-    } else {
-        res.status(401);
-        throw new Error('Not authorized, no token');
+    if (!token) {
+      return res.status(401).json({ message: 'No token, authorization denied' });
     }
-});
 
-module.exports = { protect };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { userId: decoded.userId };
+    next();
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    res.status(401).json({ message: 'Token is not valid' });
+  }
+};
+
+module.exports = protect;
+module.exports.protect = protect;

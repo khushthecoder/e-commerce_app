@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import Container from '../components/layout/container';
-import { useAuth } from '../state/authContext'; 
+import { useAuth } from '../state/authContext';
 
 const ProfileScreen = ({ navigation }) => {
-  const { userToken, logout } = useAuth();
-  const isAuthenticated = !!userToken;
+  const { user, logout, isLoading } = useAuth();
+  const isAuthenticated = !!user;
+
+  useEffect(() => {
+    console.log('ProfileScreen mounted/updated, user:', user);
+  }, [user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Profile screen focused, current user:', user);
+    }, [user])
+  );
 
   const handleLogout = async () => {
     Alert.alert(
@@ -74,8 +85,10 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.userInfoDetails}>
           {isAuthenticated ? (
             <>
-              <Text style={styles.userName}>Welcome User</Text>
-              <Text style={styles.userIdText}>You are logged in</Text>
+              <Text style={styles.userName}>
+                {isLoading ? 'Loading...' : `Welcome ${user?.name || 'User'}`}
+              </Text>
+              <Text style={styles.userEmail}>{user?.email || ''}</Text>
             </>
           ) : (
             <Text style={styles.userName}>Welcome Guest</Text>

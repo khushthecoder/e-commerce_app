@@ -1,11 +1,14 @@
+// backend/routes/authRoutes.js
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/authMiddleware'); 
-const authController = require('../controllers/authcontroller'); 
-router.post('/register', authController.registerUser); 
-router.post('/login', authController.loginUser); 
-router.get('/profile', protect, authController.getMe); 
-router.post('/forgot', authController.forgotPassword);
-router.post('/reset', authController.resetPassword);
+const { register, login, getMe } = require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware');
+
+// Public routes
+router.post('/register', register);
+router.post('/login', login);
+
+// Protected route
+router.get('/me', authMiddleware, getMe);
 
 module.exports = router;

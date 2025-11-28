@@ -26,6 +26,40 @@ exports.getOrderById = async (req, res) => {
 };
 
 
+exports.createOrder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { items, totalAmount } = req.body;
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({ error: 'No items in order' });
+    }
+
+    const order = await prisma.order.create({
+      data: {
+        userId,
+        total: parseFloat(totalAmount),
+        tax: 0, // Simplified
+        shipping: 50,
+        status: 'Pending',
+        items: {
+          create: items.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.price
+          }))
+        }
+      },
+      include: { items: true }
+    });
+
+    res.status(201).json(order);
+  } catch (err) {
+    console.error('Create order error:', err);
+    res.status(500).json({ error: 'Failed to create order' });
+  }
+};
+
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;

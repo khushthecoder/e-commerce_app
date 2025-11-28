@@ -6,8 +6,7 @@ import { useCart } from '../state/cartContext';
 
 const ProductDetailScreen = ({ route }) => {
   const { product } = route.params;
-
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
 
   const decreaseQuantity = () => {
@@ -17,37 +16,38 @@ const ProductDetailScreen = ({ route }) => {
   const increaseQuantity = () => {
     setQuantity(prev => prev + 1);
   };
-  
+
   const handleAddToCart = () => {
-    addToCart(product, quantity);
-    Alert.alert('Success', `${quantity} item(s) of ${product.name} Cart mein add ho chuka hai!`);
+    addItem(product, quantity);
+    Alert.alert('Success', `${quantity} item(s) of ${product.name} added to cart!`);
   };
 
   return (
     <Container>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Image 
-          style={styles.productImage} 
-          source={{ uri: product.imageUrl || 'https:
+        <Image
+          style={styles.productImage}
+          source={{ uri: product.image }}
         />
-        
+
         <View style={styles.detailsContainer}>
           <Text style={styles.productName}>{product.name}</Text>
-          <Text style={styles.productPrice}>₹{product.price.toFixed(2)}</Text>
-          
+          <Text style={styles.productPrice}>₹{product.price}</Text>
+          <Text style={styles.stockInfo}>Stock: {product.stock}</Text>
+
           <View style={styles.separator} />
-          
-          <Text style={styles.sectionTitle}>Product Ka Vivaran (Description)</Text>
+
+          <Text style={styles.sectionTitle}>Description</Text>
           <Text style={styles.productDescription}>
-            {product.description || 'Is product ka koi vivaran (description) available nahi hai. Yeh ek high-quality item hai jo aapki zarooraton ko poora karega!'}
+            {product.description}
           </Text>
 
           <View style={styles.separator} />
 
-          <Text style={styles.sectionTitle}>Quantity (Maatra)</Text>
+          <Text style={styles.sectionTitle}>Quantity</Text>
           <View style={styles.quantityControl}>
-            <TouchableOpacity 
-              style={styles.quantityButton} 
+            <TouchableOpacity
+              style={styles.quantityButton}
               onPress={decreaseQuantity}
               disabled={quantity === 1}
             >
@@ -56,8 +56,8 @@ const ProductDetailScreen = ({ route }) => {
 
             <Text style={styles.quantityText}>{quantity}</Text>
 
-            <TouchableOpacity 
-              style={styles.quantityButton} 
+            <TouchableOpacity
+              style={styles.quantityButton}
               onPress={increaseQuantity}
             >
               <MaterialIcons name="add" size={24} color="#333" />
@@ -70,7 +70,7 @@ const ProductDetailScreen = ({ route }) => {
         <TouchableOpacity style={styles.cartButton} onPress={handleAddToCart}>
           <MaterialIcons name="shopping-cart" size={24} color="#fff" />
           <Text style={styles.cartButtonText}>
-            Cart Mein Add Karein (₹{(product.price * quantity).toFixed(2)})
+            Add to Cart (₹{(product.price * quantity).toFixed(2)})
           </Text>
         </TouchableOpacity>
       </View>
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   productName: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 5,
@@ -102,12 +102,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: '#007AFF',
+    marginBottom: 5,
+  },
+  stockInfo: {
+    fontSize: 14,
+    color: '#28A745',
     marginBottom: 15,
   },
   separator: {
     height: 1,
     backgroundColor: '#f0f0f0',
-    marginVertical: 20,
+    marginVertical: 15,
   },
   sectionTitle: {
     fontSize: 18,
@@ -150,10 +155,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
     elevation: 5,
   },
   cartButton: {

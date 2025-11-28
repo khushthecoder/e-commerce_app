@@ -1,80 +1,161 @@
-import React, { createContext, useState, useEffect, useMemo, useContext } from 'react';
+// src/state/authContext.js
+import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../constants/api';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [userToken, setUserToken] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [authState, setAuthState] = useState({
+    userToken: null,
+    user: null,
+    isLoading: true
+  });
 
+  const fetchUser = useCallback(async () => {
+    try {
+      const response = await api.get('/users/me');
+      return {
+        id: response.data.id,
+        name: response.data.name,
+        email: response.data.email
+      };
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+      throw error;
+    }
+  }, []);
+
+  const register = useCallback(async (name, email, password) => {
+    try {
+      setAuthState(prev => ({ ...prev, isLoading: true }));
+
+      const response = await api.post('/users/register', {
+        name,
+        email,
+        password
+      });
+
+      const { token, user } = response.data;
+
+      if (!token || !user) {
+        throw new Error('Registration failed: Invalid response from server');
+      }
+
+      await AsyncStorage.setItem('userToken', token);
+
+      setAuthState({
+        userToken: token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email
+        },
+        isLoading: false
+      });
+
+      return user;
+    } catch (error) {
+      setAuthState(prev => ({ ...prev, isLoading: false }));
+      throw new Error(error.response?.data?.message || 'Registration failed');
+    }
+  }, []);
+
+  const login = useCallback(async (email, password) => {
+    try {
+      setAuthState(prev => ({ ...prev, isLoading: true }));
+
+      const response = await api.post('/users/login', {
+        email,
+        password
+      });
+
+      const { token, user } = response.data;
+
+      if (!token || !user) {
+        throw new Error('Login failed: Invalid credentials');
+      }
+
+      await AsyncStorage.setItem('userToken', token);
+
+      setAuthState({
+        userToken: token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email
+        },
+        isLoading: false
+      });
+
+      return user;
+    } catch (error) {
+      setAuthState(prev => ({ ...prev, isLoading: false }));
+      throw new Error(error.response?.data?.message || 'Login failed');
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem('userToken');
+      setAuthState({
+        userToken: null,
+        user: null,
+        isLoading: false
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw new Error('Failed to log out');
+    }
+  }, []);
+
+  // Restore token on mount
   useEffect(() => {
     const bootstrapAsync = async () => {
-      let token;
       try {
-        token = await AsyncStorage.getItem('userToken');
+        const userToken = await AsyncStorage.getItem('userToken');
+
+        if (userToken) {
+          const user = await fetchUser();
+          setAuthState({
+            userToken,
+            user,
+            isLoading: false
+          });
+        } else {
+          setAuthState(prev => ({ ...prev, isLoading: false }));
+        }
       } catch (e) {
-        console.error('Restoring token failed', e);
+        console.error('Failed to restore token', e);
+        setAuthState({
+          userToken: null,
+          user: null,
+          isLoading: false
+        });
       }
-      setUserToken(token);
-      setIsLoading(false);
     };
 
     bootstrapAsync();
-  }, []);
+  }, [fetchUser]);
 
-  const authContext = useMemo(
-    () => ({
-      login: async (email, password) => {
-        setIsLoading(true);
-        try {
-          const response = await api.post('/api/users/login', { email, password });
-          const { token } = response.data;
-
-          await AsyncStorage.setItem('userToken', token);
-          setUserToken(token);
-          setIsLoading(false);
-        } catch (error) {
-          setIsLoading(false);
-          console.error('Sign in error:', error.response?.data?.error || 'Login failed');
-          throw new Error(error.response?.data?.error || 'Login failed');
-        }
-      },
-      logout: async () => {
-        setIsLoading(true);
-        try {
-          await AsyncStorage.removeItem('userToken');
-          setUserToken(null);
-          setIsLoading(false);
-        } catch (e) {
-          console.error('Sign out error', e);
-          setIsLoading(false);
-        }
-      },
-      register: async (name, email, password) => {
-        setIsLoading(true);
-        try {
-          await api.post('/api/users/register', { name, email, password });
-          await authContext.login(email, password);
-        } catch (error) {
-          setIsLoading(false);
-          console.error('Sign up error:', error.response?.data?.error || 'Signup failed');
-          throw new Error(error.response?.data?.error || 'Signup failed');
-        }
-      },
-      userToken,
-      isLoading,
-    }),
-    [userToken, isLoading]
-  );
+  const value = useMemo(() => ({
+    ...authState,
+    register,
+    login,
+    logout
+  }), [authState, register, login, logout]);
 
   return (
-    <AuthContext.Provider value={authContext}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context = React.useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

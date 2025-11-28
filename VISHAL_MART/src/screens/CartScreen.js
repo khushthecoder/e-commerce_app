@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, TextInput, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Container from '../components/layout/container';
 import { useCart } from '../state/cartContext';
@@ -13,7 +13,7 @@ const CartItem = ({ item, onAddItem, onRemoveItem }) => {
       </View>
 
       <View style={styles.quantityControls}>
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => onRemoveItem(item.id)}
           style={[styles.qtyButton, styles.removeButton]}
         >
@@ -22,7 +22,7 @@ const CartItem = ({ item, onAddItem, onRemoveItem }) => {
 
         <Text style={styles.itemQuantity}>{item.quantity}</Text>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => onAddItem(item)}
           style={[styles.qtyButton, styles.addButton]}
         >
@@ -36,6 +36,36 @@ const CartItem = ({ item, onAddItem, onRemoveItem }) => {
 const CartScreen = ({ navigation }) => {
   const { cartState, addItem, removeItem, clearCart } = useCart();
   const { items, totalAmount } = cartState;
+
+  const [shippingAddress, setShippingAddress] = useState({
+    name: '',
+    address: '',
+    pincode: '',
+    phone: ''
+  });
+
+  const handleCheckout = () => {
+    if (items.length === 0) {
+      Alert.alert('Cart is empty', 'Please add items to your cart before checkout');
+      return;
+    }
+
+    const { name, address, pincode, phone } = shippingAddress;
+    if (!name || !address || !pincode || !phone) {
+      Alert.alert('Missing Information', 'Please fill in all address fields');
+      return;
+    }
+
+    if (phone.length < 10) {
+      Alert.alert('Invalid Phone', 'Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    navigation.navigate('Checkout', {
+      cartItems: items,
+      shippingAddress
+    });
+  };
 
   const renderItem = ({ item }) => (
     <CartItem
@@ -55,9 +85,9 @@ const CartScreen = ({ navigation }) => {
           <MaterialIcons name="shopping-cart" size={80} color="#ccc" />
           <Text style={styles.emptyText}>Your Cart is Empty!</Text>
           <Text style={styles.emptySubText}>Add some products from the Home screen.</Text>
-          <Button 
-            title="Browse Products" 
-            onPress={() => navigation.navigate('HomeStack')} 
+          <Button
+            title="Browse Products"
+            onPress={() => navigation.navigate('HomeStack')}
             color="#007AFF"
           />
         </View>
@@ -83,13 +113,55 @@ const CartScreen = ({ navigation }) => {
           <Text style={styles.totalText}>Grand Total:</Text>
           <Text style={styles.totalPrice}>₹{totalAmount.toFixed(2)}</Text>
         </View>
+        <View style={styles.addressContainer}>
+          <Text style={styles.sectionTitle}>Shipping Address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Full Name"
+            value={shippingAddress.name}
+            onChangeText={(text) => setShippingAddress(prev => ({ ...prev, name: text }))}
+          />
+          <TextInput
+            style={[styles.input, styles.multilineInput]}
+            placeholder="Full Address"
+            value={shippingAddress.address}
+            onChangeText={(text) => setShippingAddress(prev => ({ ...prev, address: text }))}
+            multiline
+            numberOfLines={3}
+          />
+          <View style={styles.row}>
+            <TextInput
+              style={[styles.input, styles.halfInput]}
+              placeholder="Pincode"
+              value={shippingAddress.pincode}
+              onChangeText={(text) => setShippingAddress(prev => ({ ...prev, pincode: text }))}
+              keyboardType="numeric"
+              maxLength={6}
+            />
+            <TextInput
+              style={[styles.input, styles.halfInput]}
+              placeholder="Phone Number"
+              value={shippingAddress.phone}
+              onChangeText={(text) => setShippingAddress(prev => ({ ...prev, phone: text }))}
+              keyboardType="phone-pad"
+              maxLength={10}
+            />
+          </View>
+        </View>
+
         <Button
           title="Proceed to Checkout"
-          onPress={() => navigation.navigate('ShippingAddress')}
+          onPress={handleCheckout}
           color="#4CAF50"
+          disabled={items.length === 0}
         />
-        <TouchableOpacity onPress={clearCart} style={styles.clearButton}>
-            <Text style={styles.clearButtonText}>Empty Cart</Text>
+
+        <TouchableOpacity
+          onPress={clearCart}
+          style={[styles.clearButton, items.length === 0 && styles.disabledButton]}
+          disabled={items.length === 0}
+        >
+          <Text style={styles.clearButtonText}>Empty Cart</Text>
         </TouchableOpacity>
       </View>
     </Container>
@@ -195,6 +267,43 @@ const styles = StyleSheet.create({
   clearButton: {
     marginTop: 10,
     alignSelf: 'center',
+  },
+  addressContainer: {
+    padding: 15,
+    backgroundColor: '#fff',
+    marginVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 12,
+    borderRadius: 5,
+    marginBottom: 10,
+    backgroundColor: '#f9f9f9',
+    fontSize: 14,
+  },
+  multilineInput: {
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  halfInput: {
+    width: '48%',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   clearButtonText: {
     color: '#FF6347',

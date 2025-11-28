@@ -1,24 +1,27 @@
-
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
 
 const { width } = Dimensions.get('window');
 const cardWidth = width / 2 - 24;
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onPress }) => {
   if (!product) {
     return null;
   }
 
   return (
-    <View style={styles.card}>
-      <View style={styles.imagePlaceholder} />
-      <Text style={styles.name}>{product.name}</Text>
-      <Text style={styles.price}>${product.price}</Text>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
+      <Image
+        source={{ uri: product.image }}
+        style={styles.image}
+        resizeMode="cover"
+      />
+      <Text style={styles.name} numberOfLines={1}>{product.name}</Text>
+      <Text style={styles.price}>₹{product.price}</Text>
       <Text style={styles.description} numberOfLines={2}>
         {product.description}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -35,7 +38,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  imagePlaceholder: {
+  image: {
     width: '100%',
     height: 120,
     backgroundColor: '#e0e0e0',
@@ -46,10 +49,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: '#333',
   },
   price: {
     fontSize: 14,
-    color: '#888',
+    color: '#007AFF',
+    fontWeight: '600',
     marginBottom: 4,
   },
   description: {

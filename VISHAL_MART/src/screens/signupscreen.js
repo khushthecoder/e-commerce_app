@@ -1,8 +1,7 @@
+// src/screens/SignupScreen.js
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from '../state/authContext';
-import InputField from '../components/common/inputfield';
-import Container from '../components/layout/container';
 
 const SignupScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -10,72 +9,70 @@ const SignupScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const { register, isLoading } = useAuth();
 
-  const onRegister = async () => {
-    if (!name || !email || !password) {
-      return Alert.alert('Error', 'Please fill all fields.');
-    }
-
+  const handleSignup = async () => {
     try {
       await register(name, email, password);
-
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error', error.message || 'Registration failed.');
+      Alert.alert('Error', error.message);
     }
   };
 
   return (
-    <Container>
-      <Text style={styles.header}>Create Account</Text>
-
-      <InputField
-        placeholder="Full Name"
+    <View style={styles.container}>
+      <Text style={styles.title}>Create Account</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
         value={name}
         onChangeText={setName}
       />
-      <InputField
+      <TextInput
+        style={styles.input}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
+        autoCapitalize="none"
         keyboardType="email-address"
       />
-      <InputField
+      <TextInput
+        style={styles.input}
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-
-      <View style={styles.buttonContainer}>
-        <Button
-          title={isLoading ? 'Registering...' : 'Sign Up'}
-          onPress={onRegister}
-          disabled={isLoading}
-        />
-      </View>
-
-      <Text style={styles.loginText} onPress={() => navigation.navigate('Login')}>
-        Already have an account? Log In
-      </Text>
-    </Container>
+      {isLoading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <Button title="Sign Up" onPress={handleSignup} />
+      )}
+      <Button
+        title="Already have an account? Login"
+        onPress={() => navigation.navigate('Login')}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 30,
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
     textAlign: 'center',
   },
-  buttonContainer: {
-    marginTop: 20,
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 10,
+    borderRadius: 5,
   },
-  loginText: {
-    marginTop: 15,
-    textAlign: 'center',
-    color: '#007AFF',
-  }
 });
 
 export default SignupScreen;
