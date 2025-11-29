@@ -47,11 +47,12 @@ function generateProduct(i) {
   const name = nameList[randomInt(0, nameList.length - 1)] + " " + randomInt(100, 999);
 
   return {
-    name,
+    title: name,
     description: `High-quality ${name.toLowerCase()} perfect for daily use. Durable and stylish design.`,
     price: randomInt(199, 49999),
     stock: randomInt(5, 200),
-    image: `https://source.unsplash.com/random/800x800/?${category},product,${i}`
+    thumbnail: `https://source.unsplash.com/random/800x800/?${category},product,${i}`,
+    category: category
   };
 }
 
