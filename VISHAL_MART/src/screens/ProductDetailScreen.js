@@ -7,10 +7,10 @@ import { useCart } from '../state/cartContext';
 const ProductDetailScreen = ({ route }) => {
   const { product } = route.params;
   const { addItem } = useCart();
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
 
   const decreaseQuantity = () => {
-    setQuantity(prev => Math.max(1, prev - 1));
+    setQuantity(prev => Math.max(0, prev - 1));
   };
 
   const increaseQuantity = () => {
@@ -49,9 +49,9 @@ const ProductDetailScreen = ({ route }) => {
             <TouchableOpacity
               style={styles.quantityButton}
               onPress={decreaseQuantity}
-              disabled={quantity === 1}
+              disabled={quantity === 0}
             >
-              <MaterialIcons name="remove" size={24} color={quantity === 1 ? '#ccc' : '#333'} />
+              <MaterialIcons name="remove" size={24} color={quantity === 0 ? '#ccc' : '#333'} />
             </TouchableOpacity>
 
             <Text style={styles.quantityText}>{quantity}</Text>

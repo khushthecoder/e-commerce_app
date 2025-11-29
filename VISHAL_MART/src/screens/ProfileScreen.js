@@ -46,23 +46,23 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   const menuItems = [
-    { 
-      id: 'orders', 
-      title: 'Order History', 
-      icon: 'receipt-long', 
-      onPress: () => navigation.navigate('OrderHistory') 
+    {
+      id: 'orders',
+      title: 'Order History',
+      icon: 'receipt-long',
+      onPress: () => navigation.navigate('OrderHistory')
     },
-    { 
-      id: 'address', 
-      title: 'Shipping Addresses', 
-      icon: 'location-on', 
-      onPress: () => Alert.alert('WIP', 'This feature is under development.') 
+    {
+      id: 'address',
+      title: 'Shipping Addresses',
+      icon: 'location-on',
+      onPress: () => navigation.navigate('ShippingAddress')
     },
-    { 
-      id: 'settings', 
-      title: 'Settings', 
-      icon: 'settings', 
-      onPress: () => Alert.alert('WIP', 'This feature is under development.') 
+    {
+      id: 'settings',
+      title: 'Settings',
+      icon: 'settings',
+      onPress: () => Alert.alert('WIP', 'This feature is under development.')
     },
   ];
 
@@ -98,11 +98,11 @@ const ProfileScreen = ({ navigation }) => {
 
       <View style={styles.menuContainer}>
         {menuItems.map(item => (
-          <MenuItem 
-            key={item.id} 
-            title={item.title} 
-            icon={item.icon} 
-            onPress={item.onPress} 
+          <MenuItem
+            key={item.id}
+            title={item.title}
+            icon={item.icon}
+            onPress={item.onPress}
           />
         ))}
       </View>
@@ -112,12 +112,12 @@ const ProfileScreen = ({ navigation }) => {
           <Button
             title="Log Out"
             onPress={handleLogout}
-            color="#FF6347" 
+            color="#FF6347"
           />
         ) : (
           <Button
             title="Login / Signup"
-            onPress={() => navigation.navigate('Login')} 
+            onPress={() => navigation.navigate('Login')}
             color="#007AFF"
           />
         )}
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#555',
     marginTop: 5,
-    fontFamily: 'monospace', 
+    fontFamily: 'monospace',
   },
 
   menuContainer: {
@@ -199,8 +199,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   logoutButtonContainer: {
-      marginTop: 30,
-      marginHorizontal: 20,
+    marginTop: 30,
+    marginHorizontal: 20,
   }
 });
 

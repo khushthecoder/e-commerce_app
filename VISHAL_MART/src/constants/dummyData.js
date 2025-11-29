@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, Text, ActivityIndicator } from 'react-native';
-import axios from 'axios';
+import api from './api';
 import ProductCard from '../../components/product/ProductCard';
-
-
-const API_URL = 'https:
 
 const HomeScreen = () => {
   const [products, setProducts] = useState([]);
@@ -14,8 +11,8 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(API_URL);
-        setProducts(response.data.products);
+        const response = await api.get('/products');
+        setProducts(response.data);
       } catch (e) {
         setError(e.message);
       } finally {
@@ -47,7 +44,7 @@ const HomeScreen = () => {
       <FlatList
         data={products}
         renderItem={({ item }) => <ProductCard product={item} />}
-        
+
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
         contentContainerStyle={styles.list}
