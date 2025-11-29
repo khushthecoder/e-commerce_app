@@ -1,4 +1,3 @@
-// src/state/authContext.js
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../constants/api';

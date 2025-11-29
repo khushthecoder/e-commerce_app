@@ -39,7 +39,7 @@ exports.createOrder = async (req, res) => {
       data: {
         userId,
         total: parseFloat(totalAmount),
-        tax: 0, // Simplified
+        tax: 0,
         shipping: 50,
         status: 'Pending',
         items: {

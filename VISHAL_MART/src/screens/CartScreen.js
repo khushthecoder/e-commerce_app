@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, TextInput, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Container from '../components/layout/container';
 import { useCart } from '../state/cartContext';
+import { useAuth } from '../state/authContext';
+import { addressService } from '../utils/addressService';
 
 const CartItem = ({ item, onAddItem, onRemoveItem }) => {
   return (
@@ -43,6 +45,48 @@ const CartScreen = ({ navigation }) => {
     pincode: '',
     phone: ''
   });
+
+  const { user } = useAuth();
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+
+  useEffect(() => {
+    if (user?.id) {
+      const unsubscribe = addressService.subscribeToAddresses(user.id, setSavedAddresses);
+      return () => unsubscribe();
+    }
+  }, [user]);
+
+  const handleSelectAddress = (address) => {
+    setShippingAddress({
+      name: address.name,
+      address: `${address.houseNo}, ${address.street}, ${address.city}, ${address.state}`,
+      pincode: address.pincode,
+      phone: address.phone
+    });
+    setSelectedAddressId(address.id);
+  };
+
+  const renderAddressCard = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.savedAddressCard,
+        selectedAddressId === item.id && styles.selectedAddressCard
+      ]}
+      onPress={() => handleSelectAddress(item)}
+    >
+      <Text style={styles.savedAddressName}>{item.name}</Text>
+      <Text style={styles.savedAddressText} numberOfLines={2}>
+        {`${item.houseNo}, ${item.street}, ${item.city}`}
+      </Text>
+      <Text style={styles.savedAddressText}>{item.phone}</Text>
+      {selectedAddressId === item.id && (
+        <View style={styles.selectedBadge}>
+          <MaterialIcons name="check-circle" size={20} color="#4CAF50" />
+        </View>
+      )}
+    </TouchableOpacity>
+  );
 
   const handleCheckout = () => {
     if (items.length === 0) {
@@ -114,7 +158,23 @@ const CartScreen = ({ navigation }) => {
           <Text style={styles.totalPrice}>₹{totalAmount.toFixed(2)}</Text>
         </View>
         <View style={styles.addressContainer}>
-          <Text style={styles.sectionTitle}>Shipping Address</Text>
+          <Text style={styles.sectionTitle}>Select Saved Address</Text>
+          {savedAddresses.length > 0 ? (
+            <FlatList
+              data={savedAddresses}
+              renderItem={renderAddressCard}
+              keyExtractor={item => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.savedAddressList}
+            />
+          ) : (
+            <Text style={styles.noSavedAddressText}>
+              No saved addresses found. Please add one from Profile.
+            </Text>
+          )}
+
+          <Text style={[styles.sectionTitle, { marginTop: 15 }]}>Or Enter Manually</Text>
           <TextInput
             style={styles.input}
             placeholder="Full Name"
@@ -329,6 +389,44 @@ const styles = StyleSheet.create({
     color: '#888',
     marginBottom: 20,
     textAlign: 'center',
+  },
+  savedAddressList: {
+    paddingBottom: 10,
+  },
+  savedAddressCard: {
+    width: 200,
+    padding: 12,
+    marginRight: 10,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  selectedAddressCard: {
+    borderColor: '#4CAF50',
+    backgroundColor: '#e8f5e9',
+  },
+  savedAddressName: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginBottom: 4,
+    color: '#333',
+  },
+  savedAddressText: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 2,
+  },
+  selectedBadge: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+  },
+  noSavedAddressText: {
+    fontSize: 14,
+    color: '#888',
+    fontStyle: 'italic',
+    marginBottom: 10,
   }
 });
 
