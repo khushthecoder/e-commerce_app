@@ -11,11 +11,8 @@ const CheckoutScreen = ({ navigation, route }) => {
   const { clearCart } = useCart();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-
-  // Safe destructuring with defaults
   const { cartItems = [], shippingAddress = {} } = route.params || {};
 
-  // Calculate total from passed items
   const cartTotal = (cartItems || []).reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const ItemSummary = ({ item }) => (
@@ -62,12 +59,10 @@ const CheckoutScreen = ({ navigation, route }) => {
     };
 
     try {
-      // Try backend
       await api.post('/orders', orderData);
       Alert.alert('Success', 'Order placed successfully!');
     } catch (e) {
       console.log("Backend failed, saving locally", e);
-      // Fallback to local storage
       try {
         const existingOrders = await AsyncStorage.getItem('local_orders');
         const orders = existingOrders ? JSON.parse(existingOrders) : [];

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, Alert, TouchableOpacity, Modal, Pressable } from 'react-native';
 import Container from '../components/layout/container';

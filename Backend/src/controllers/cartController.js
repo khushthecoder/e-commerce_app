@@ -1,8 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// ===================== GET CART =====================
-
 exports.getCart = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -26,7 +24,7 @@ exports.getCart = async (req, res) => {
   }
 };
 
-// ===================== ADD TO CART =====================
+
 
 exports.addToCart = async (req, res) => {
   try {
@@ -88,8 +86,6 @@ exports.addToCart = async (req, res) => {
   }
 };
 
-// ===================== REMOVE FROM CART =====================
-
 exports.removeFromCart = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -127,7 +123,7 @@ exports.removeFromCart = async (req, res) => {
   }
 };
 
-// ===================== UPDATE CART ITEM =====================
+
 
 exports.updateCartItem = async (req, res) => {
   try {
@@ -172,7 +168,7 @@ exports.updateCartItem = async (req, res) => {
   }
 };
 
-// ===================== CHECKOUT (PLACE ORDER) =====================
+
 
 exports.checkout = async (req, res) => {
   try {
