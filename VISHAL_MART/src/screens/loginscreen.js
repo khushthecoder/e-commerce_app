@@ -29,6 +29,9 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        autoCorrect={false}
+        autoComplete="off"
+        textContentType="none"
       />
       <TextInput
         style={styles.input}
@@ -37,6 +40,9 @@ const LoginScreen = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        autoCorrect={false}
+        autoComplete="off"
+        textContentType="none"
       />
       {isLoading ? (
         <ActivityIndicator size="large" color={colors.primary} />

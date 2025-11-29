@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import Container from '../components/layout/container';
+import Container from '../components/layout/Container';
 import { useAuth } from '../state/authContext';
 import { useTheme } from '../theme/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -71,6 +71,9 @@ const EditProfileScreen = ({ navigation }) => {
                             onChangeText={(text) => handleChange('name', text)}
                             placeholder="Enter your full name"
                             placeholderTextColor={colors.text + '80'}
+                            autoCorrect={false}
+                            autoComplete="off"
+                            textContentType="none"
                         />
                     </View>
 
@@ -84,6 +87,9 @@ const EditProfileScreen = ({ navigation }) => {
                             keyboardType="email-address"
                             autoCapitalize="none"
                             placeholderTextColor={colors.text + '80'}
+                            autoCorrect={false}
+                            autoComplete="off"
+                            textContentType="none"
                         />
                     </View>
 
@@ -96,6 +102,9 @@ const EditProfileScreen = ({ navigation }) => {
                             placeholder="Enter your phone number"
                             keyboardType="phone-pad"
                             placeholderTextColor={colors.text + '80'}
+                            autoCorrect={false}
+                            autoComplete="off"
+                            textContentType="none"
                         />
                     </View>
 
@@ -109,6 +118,9 @@ const EditProfileScreen = ({ navigation }) => {
                             multiline
                             numberOfLines={3}
                             placeholderTextColor={colors.text + '80'}
+                            autoCorrect={false}
+                            autoComplete="off"
+                            textContentType="none"
                         />
                     </View>
 

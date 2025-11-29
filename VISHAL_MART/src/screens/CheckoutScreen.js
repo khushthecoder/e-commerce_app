@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Container from '../components/layout/container';
+import Container from '../components/layout/Container';
 import { useCart } from '../state/cartContext';
 import { useAuth } from '../state/authContext';
 import { useOrder } from '../state/orderContext';

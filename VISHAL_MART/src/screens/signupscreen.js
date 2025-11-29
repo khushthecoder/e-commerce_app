@@ -40,6 +40,9 @@ const SignupScreen = ({ navigation }) => {
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        autoCorrect={false}
+        autoComplete="off"
+        textContentType="none"
       />
       <TextInput
         style={styles.input}
@@ -48,6 +51,9 @@ const SignupScreen = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        autoCorrect={false}
+        autoComplete="off"
+        textContentType="none"
       />
       {isLoading ? (
         <ActivityIndicator size="large" color={colors.primary} />

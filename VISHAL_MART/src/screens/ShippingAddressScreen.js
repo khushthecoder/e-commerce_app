@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, Alert, TouchableOpacity, Modal, Pressable, TextInput } from 'react-native';
-import Container from '../components/layout/container';
+import Container from '../components/layout/Container';
 import { addressService } from '../utils/addressService';
 import { useAuth } from '../state/authContext';
 import { useTheme } from '../theme/ThemeContext';
@@ -150,46 +150,74 @@ const ShippingAddressScreen = ({ navigation }) => {
             <TextInput
               style={styles.input}
               placeholder="Full Name"
+              placeholderTextColor={colors.placeholder}
               value={currentAddress.name}
               onChangeText={text => setCurrentAddress({ ...currentAddress, name: text })}
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
+              placeholderTextColor={colors.placeholder}
               value={currentAddress.phone}
               onChangeText={text => setCurrentAddress({ ...currentAddress, phone: text })}
               keyboardType="phone-pad"
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
             <TextInput
               style={styles.input}
               placeholder="House No, Building"
+              placeholderTextColor={colors.placeholder}
               value={currentAddress.houseNo}
               onChangeText={text => setCurrentAddress({ ...currentAddress, houseNo: text })}
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
             <TextInput
               style={styles.input}
               placeholder="Street, Area"
+              placeholderTextColor={colors.placeholder}
               value={currentAddress.street}
               onChangeText={text => setCurrentAddress({ ...currentAddress, street: text })}
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
             <TextInput
               style={styles.input}
               placeholder="City"
+              placeholderTextColor={colors.placeholder}
               value={currentAddress.city}
               onChangeText={text => setCurrentAddress({ ...currentAddress, city: text })}
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
             <TextInput
               style={styles.input}
               placeholder="State"
+              placeholderTextColor={colors.placeholder}
               value={currentAddress.state}
               onChangeText={text => setCurrentAddress({ ...currentAddress, state: text })}
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
             <TextInput
               style={styles.input}
               placeholder="Pincode"
+              placeholderTextColor={colors.placeholder}
               value={currentAddress.pincode}
               onChangeText={text => setCurrentAddress({ ...currentAddress, pincode: text })}
               keyboardType="numeric"
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
 
             <View style={styles.modalActions}>
@@ -306,12 +334,13 @@ const stylesConfig = (colors) => StyleSheet.create({
   input: {
     width: '100%',
     height: 40,
-    borderColor: '#ddd',
+    borderColor: colors.border,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    backgroundColor: '#f9f9f9'
+    backgroundColor: colors.inputBackground,
+    color: colors.text
   }
 });
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TextInput, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
 import { useAuth } from '../state/authContext';
-import ProductCard from '../components/product/Productcard';
+import ProductCard from '../components/product/ProductCard';
 import { useTheme } from '../theme/ThemeContext';
 
 import { PRODUCT_IMAGES } from '../constants/productImages';
@@ -121,6 +121,9 @@ const HomeScreen = ({ navigation }) => {
           value={search}
           onChangeText={setSearch}
           style={themedStyles.searchInput}
+          autoCorrect={false}
+          autoComplete="off"
+          textContentType="none"
         />
       </View>
 

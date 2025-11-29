@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import Container from '../components/layout/container';
+import Container from '../components/layout/Container';
 import { useAuth } from '../state/authContext';
 import { useOrder } from '../state/orderContext';
 import { useTheme } from '../theme/ThemeContext';
@@ -52,7 +52,7 @@ const formatDate = (dateString) => {
 const OrderCard = ({ order, styles, colors }) => {
   const statusColor = getStatusColor(order.status, colors);
   const statusIcon = getStatusIcon(order.status);
-  const badgeBackgroundColor = statusColor + '20'; 
+  const badgeBackgroundColor = statusColor + '20';
 
   return (
     <View style={styles.card}>
@@ -204,14 +204,14 @@ const stylesConfig = (colors) => ({
     fontSize: 14,
     fontWeight: '600',
     color: colors.text,
-    fontFamily: 'System', 
+    fontFamily: 'System',
   },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12, 
+    borderRadius: 12,
   },
   statusText: {
     fontSize: 12,

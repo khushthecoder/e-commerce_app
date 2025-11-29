@@ -1,8 +1,8 @@
 import React, { useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Button, TouchableOpacity, Alert, Switch } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
-import Container from '../components/layout/container';
+
+import Container from '../components/layout/Container';
 import { useAuth } from '../state/authContext';
 import { useTheme } from '../theme/ThemeContext';
 

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, TextInput,
 import { useCart } from '../state/cartContext';
 import { API_BASE_URL as API_URL } from '../constants/api';
 import { useTheme } from '../theme/ThemeContext';
-import Container from '../components/layout/container';
+import Container from '../components/layout/Container';
 
 const ProductDetailScreen = ({ route }) => {
   const { product } = route.params;
@@ -108,7 +108,7 @@ const ProductDetailScreen = ({ route }) => {
         setReviews(prev => [newReview, ...prev]);
         setRating(0);
         setReviewText('');
-        Alert.alert('Success', 'Thank you for your review! (Demo Mode)');
+        Alert.alert('Success', 'Thank you for your review!');
         return;
       }
       const response = await fetch(`${API_URL}/reviews`, {
@@ -239,6 +239,9 @@ const ProductDetailScreen = ({ route }) => {
               value={reviewText}
               onChangeText={setReviewText}
               multiline
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
             <TouchableOpacity
               style={[

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, TextInput, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import Container from '../components/layout/container';
+import Container from '../components/layout/Container';
 import { useCart } from '../state/cartContext';
 import { useAuth } from '../state/authContext';
 import { addressService } from '../utils/addressService';
@@ -186,6 +186,9 @@ const CartScreen = ({ navigation }) => {
             placeholderTextColor={colors.placeholder}
             value={shippingAddress.name}
             onChangeText={(text) => setShippingAddress(prev => ({ ...prev, name: text }))}
+            autoCorrect={false}
+            autoComplete="off"
+            textContentType="none"
           />
           <TextInput
             style={[styles.input, styles.multilineInput]}
@@ -195,6 +198,9 @@ const CartScreen = ({ navigation }) => {
             onChangeText={(text) => setShippingAddress(prev => ({ ...prev, address: text }))}
             multiline
             numberOfLines={3}
+            autoCorrect={false}
+            autoComplete="off"
+            textContentType="none"
           />
           <View style={styles.row}>
             <TextInput
@@ -205,6 +211,9 @@ const CartScreen = ({ navigation }) => {
               onChangeText={(text) => setShippingAddress(prev => ({ ...prev, pincode: text }))}
               keyboardType="numeric"
               maxLength={6}
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
             <TextInput
               style={[styles.input, styles.halfInput]}
@@ -214,6 +223,9 @@ const CartScreen = ({ navigation }) => {
               onChangeText={(text) => setShippingAddress(prev => ({ ...prev, phone: text }))}
               keyboardType="phone-pad"
               maxLength={10}
+              autoCorrect={false}
+              autoComplete="off"
+              textContentType="none"
             />
           </View>
         </View>
