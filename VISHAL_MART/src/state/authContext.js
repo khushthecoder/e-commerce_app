@@ -107,20 +107,28 @@ export const AuthProvider = ({ children }) => {
       throw new Error('Failed to log out');
     }
   }, []);
-
-  // Restore token on mount
   useEffect(() => {
     const bootstrapAsync = async () => {
       try {
         const userToken = await AsyncStorage.getItem('userToken');
 
         if (userToken) {
-          const user = await fetchUser();
-          setAuthState({
-            userToken,
-            user,
-            isLoading: false
-          });
+          try {
+            const user = await fetchUser();
+            setAuthState({
+              userToken,
+              user,
+              isLoading: false
+            });
+          } catch (fetchError) {
+            console.log('Failed to fetch user with token:', fetchError.message);
+            await AsyncStorage.removeItem('userToken');
+            setAuthState({
+              userToken: null,
+              user: null,
+              isLoading: false
+            });
+          }
         } else {
           setAuthState(prev => ({ ...prev, isLoading: false }));
         }
@@ -137,12 +145,31 @@ export const AuthProvider = ({ children }) => {
     bootstrapAsync();
   }, [fetchUser]);
 
+  const updateProfile = useCallback(async (userData) => {
+    try {
+      setAuthState(prev => ({ ...prev, isLoading: true }));
+      const updatedUser = { ...authState.user, ...userData };
+
+      setAuthState(prev => ({
+        ...prev,
+        user: updatedUser,
+        isLoading: false
+      }));
+      return updatedUser;
+    } catch (error) {
+      setAuthState(prev => ({ ...prev, isLoading: false }));
+      throw error;
+    }
+  }, [authState.user]);
+
   const value = useMemo(() => ({
     ...authState,
     register,
     login,
-    logout
-  }), [authState, register, login, logout]);
+    logout,
+    setAuthState, 
+    updateProfile 
+  }), [authState, register, login, logout, updateProfile]);
 
   return (
     <AuthContext.Provider value={value}>

@@ -95,13 +95,22 @@ export const CartContext = createContext({
   clearCart: () => { },
 });
 
+import { useAuth } from './authContext';
+
 export const CartProvider = ({ children }) => {
   const [cartState, dispatch] = useReducer(cartReducer, initialCartState);
+  const { user } = useAuth();
+  const userId = user?.id;
 
   useEffect(() => {
     const loadCart = async () => {
+      if (!userId) {
+        dispatch({ type: 'SET_CART', payload: initialCartState });
+        return;
+      }
+
       try {
-        const storedCart = await AsyncStorage.getItem(CART_STORAGE_KEY);
+        const storedCart = await AsyncStorage.getItem(`cart_${userId}`);
         if (storedCart) {
           const parsedCart = JSON.parse(storedCart);
           dispatch({ type: 'SET_CART', payload: parsedCart });
@@ -115,14 +124,14 @@ export const CartProvider = ({ children }) => {
     };
 
     loadCart();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
-    if (!cartState.isLoading) {
+    if (!cartState.isLoading && userId) {
       const saveCart = async () => {
         try {
           await AsyncStorage.setItem(
-            CART_STORAGE_KEY,
+            `cart_${userId}`,
             JSON.stringify({
               items: cartState.items,
               totalAmount: cartState.totalAmount,
@@ -136,7 +145,7 @@ export const CartProvider = ({ children }) => {
 
       saveCart();
     }
-  }, [cartState]);
+  }, [cartState, userId]);
 
   const addItem = (product, quantity = 1) => {
     if (!product || !product.id) return;
@@ -154,8 +163,15 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  const clearCart = () => {
+  const clearCart = async () => {
     dispatch({ type: 'CLEAR_CART' });
+    if (userId) {
+      try {
+        await AsyncStorage.setItem(`cart_${userId}`, JSON.stringify(initialCartState));
+      } catch (e) {
+        console.error("Failed to clear cart storage", e);
+      }
+    }
   };
 
   const value = {

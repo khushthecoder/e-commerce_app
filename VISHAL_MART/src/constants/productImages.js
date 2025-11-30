@@ -1,5 +1,4 @@
 export const PRODUCT_IMAGES = {
-    // --- SHOES ---
     'Running Shoes': [
         'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=600&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80&w=600&auto=format&fit=crop',
@@ -12,6 +11,7 @@ export const PRODUCT_IMAGES = {
         'https://loremflickr.com/600/600/running,shoes?lock=2',
         'https://loremflickr.com/600/600/running,shoes?lock=3',
     ],
+
     'Sneakers': [
         'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=600&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=600&auto=format&fit=crop',
@@ -24,6 +24,7 @@ export const PRODUCT_IMAGES = {
         'https://loremflickr.com/600/600/sneakers?lock=6',
         'https://loremflickr.com/600/600/sneakers?lock=7',
     ],
+
     'Boots': [
         'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=600&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?q=80&w=600&auto=format&fit=crop',
@@ -36,6 +37,7 @@ export const PRODUCT_IMAGES = {
         'https://loremflickr.com/600/600/boots?lock=11',
         'https://loremflickr.com/600/600/boots?lock=12',
     ],
+    
     'Sandals': [
         'https://images.unsplash.com/photo-1543508282-6319a3e2621f?q=80&w=600&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1562273138-f46be4ebdf33?q=80&w=600&auto=format&fit=crop',
@@ -60,8 +62,6 @@ export const PRODUCT_IMAGES = {
         'https://loremflickr.com/600/600/loafers?lock=24',
         'https://loremflickr.com/600/600/loafers?lock=25',
     ],
-
-    // --- ELECTRONICS ---
     'Headphones': [
         'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=600&auto=format&fit=crop',
@@ -122,8 +122,6 @@ export const PRODUCT_IMAGES = {
         'https://loremflickr.com/600/600/earbuds?lock=55',
         'https://loremflickr.com/600/600/earbuds?lock=56',
     ],
-
-    // --- WATCHES ---
     'Smart Watch': [
         'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=600&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?q=80&w=600&auto=format&fit=crop',
@@ -172,8 +170,6 @@ export const PRODUCT_IMAGES = {
         'https://loremflickr.com/600/600/watchstrap?lock=84',
         'https://loremflickr.com/600/600/watchstrap?lock=85',
     ],
-
-    // --- BAGS ---
     'Backpack': [
         'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=600&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1581605405669-fcdf81165afa?q=80&w=600&auto=format&fit=crop',
@@ -234,8 +230,6 @@ export const PRODUCT_IMAGES = {
         'https://loremflickr.com/600/600/wallet?lock=119',
         'https://loremflickr.com/600/600/wallet?lock=120',
     ],
-
-    // --- CLOTHING ---
     'T-Shirt': [
         'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=600&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=600&auto=format&fit=crop',
@@ -296,8 +290,6 @@ export const PRODUCT_IMAGES = {
         'https://loremflickr.com/600/600/shirt?lock=155',
         'https://loremflickr.com/600/600/shirt?lock=156',
     ],
-
-    // --- ACCESSORIES ---
     'Sunglasses': [
         'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=600&auto=format&fit=crop',
         'https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=600&auto=format&fit=crop',
