@@ -1,48 +1,24 @@
 import React, { useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Button, TouchableOpacity, Alert, Switch } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import Container from '../components/layout/container';
 import { useAuth } from '../state/authContext';
+import { useTheme } from '../theme/ThemeContext';
 
 const ProfileScreen = ({ navigation }) => {
   const { user, logout, isLoading } = useAuth();
+  const { colors, createStyles, isDark, toggleTheme } = useTheme();
+  const styles = createStyles(stylesConfig);
   const isAuthenticated = !!user;
 
-  useEffect(() => {
-    console.log('ProfileScreen mounted/updated, user:', user);
-  }, [user]);
-
-  useFocusEffect(
-    useCallback(() => {
-      console.log('Profile screen focused, current user:', user);
-    }, [user])
-  );
-
   const handleLogout = async () => {
-    Alert.alert(
-      'Confirm Logout',
-      'Are you sure you want to log out?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Logout',
-          onPress: async () => {
-            try {
-              await logout();
-            } catch (e) {
-              Alert.alert('Error', 'There was a problem logging out.');
-              console.error('Logout Error:', e);
-            }
-          },
-          style: 'destructive',
-        },
-      ],
-      { cancelable: true }
-    );
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+      Alert.alert('Error', 'Failed to logout');
+    }
   };
 
   const menuItems = [
@@ -62,15 +38,24 @@ const ProfileScreen = ({ navigation }) => {
       id: 'settings',
       title: 'Settings',
       icon: 'settings',
-      onPress: () => Alert.alert('WIP', 'This feature is under development.')
+      onPress: () => navigation.navigate('EditProfile')
     },
   ];
 
-  const MenuItem = ({ title, icon, onPress }) => (
-    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-      <MaterialIcons name={icon} size={24} color="#007AFF" />
+  const MenuItem = ({ title, icon, onPress, isSwitch, value, onValueChange }) => (
+    <TouchableOpacity style={styles.menuItem} onPress={onPress} disabled={isSwitch}>
+      <MaterialIcons name={icon} size={24} color={colors.primary} />
       <Text style={styles.menuItemText}>{title}</Text>
-      <MaterialIcons name="chevron-right" size={24} color="#ccc" />
+      {isSwitch ? (
+        <Switch
+          value={value}
+          onValueChange={onValueChange}
+          trackColor={{ false: "#767577", true: colors.primary }}
+          thumbColor={value ? "#f4f3f4" : "#f4f3f4"}
+        />
+      ) : (
+        <MaterialIcons name="chevron-right" size={24} color={colors.subText} />
+      )}
     </TouchableOpacity>
   );
 
@@ -81,7 +66,7 @@ const ProfileScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.userInfoCard}>
-        <MaterialIcons name="account-circle" size={60} color="#007AFF" />
+        <MaterialIcons name="account-circle" size={60} color={colors.primary} />
         <View style={styles.userInfoDetails}>
           {isAuthenticated ? (
             <>
@@ -105,6 +90,14 @@ const ProfileScreen = ({ navigation }) => {
             onPress={item.onPress}
           />
         ))}
+        <MenuItem
+          key="theme-toggle"
+          title="Dark Mode"
+          icon="brightness-6"
+          isSwitch={true}
+          value={isDark}
+          onValueChange={toggleTheme}
+        />
       </View>
 
       <View style={styles.logoutButtonContainer}>
@@ -112,13 +105,13 @@ const ProfileScreen = ({ navigation }) => {
           <Button
             title="Log Out"
             onPress={handleLogout}
-            color="#FF6347"
+            color={colors.danger}
           />
         ) : (
           <Button
             title="Login / Signup"
             onPress={() => navigation.navigate('Login')}
-            color="#007AFF"
+            color={colors.primary}
           />
         )}
       </View>
@@ -127,20 +120,20 @@ const ProfileScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const stylesConfig = (colors) => ({
   header: {
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: colors.border,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text,
   },
   userInfoCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     padding: 20,
     margin: 10,
     borderRadius: 10,
@@ -152,6 +145,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   userInfoDetails: {
     marginLeft: 15,
@@ -159,23 +154,23 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text,
   },
   userEmail: {
     fontSize: 14,
-    color: '#888',
+    color: colors.subText,
     marginTop: 2,
   },
   userIdText: {
     fontSize: 12,
-    color: '#555',
+    color: colors.subText,
     marginTop: 5,
     fontFamily: 'monospace',
   },
 
   menuContainer: {
     marginHorizontal: 10,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderRadius: 10,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -183,18 +178,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: colors.border,
   },
   menuItemText: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: colors.text,
     marginLeft: 15,
     fontWeight: '500',
   },

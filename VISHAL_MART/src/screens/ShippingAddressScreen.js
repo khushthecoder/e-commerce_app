@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Button, Alert, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, Alert, TouchableOpacity, Modal, Pressable, TextInput } from 'react-native';
 import Container from '../components/layout/container';
-import InputField from '../components/common/inputfield';
 import { addressService } from '../utils/addressService';
 import { useAuth } from '../state/authContext';
 
@@ -144,13 +143,52 @@ const ShippingAddressScreen = ({ navigation }) => {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalTitle}>{isEditing ? 'Edit Address' : 'Add New Address'}</Text>
-            <InputField placeholder="Full Name" value={currentAddress.name} onChangeText={text => setCurrentAddress({ ...currentAddress, name: text })} />
-            <InputField placeholder="Phone Number" value={currentAddress.phone} onChangeText={text => setCurrentAddress({ ...currentAddress, phone: text })} keyboardType="phone-pad" />
-            <InputField placeholder="House No, Building" value={currentAddress.houseNo} onChangeText={text => setCurrentAddress({ ...currentAddress, houseNo: text })} />
-            <InputField placeholder="Street, Area" value={currentAddress.street} onChangeText={text => setCurrentAddress({ ...currentAddress, street: text })} />
-            <InputField placeholder="City" value={currentAddress.city} onChangeText={text => setCurrentAddress({ ...currentAddress, city: text })} />
-            <InputField placeholder="State" value={currentAddress.state} onChangeText={text => setCurrentAddress({ ...currentAddress, state: text })} />
-            <InputField placeholder="Pincode" value={currentAddress.pincode} onChangeText={text => setCurrentAddress({ ...currentAddress, pincode: text })} keyboardType="numeric" />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Full Name"
+              value={currentAddress.name}
+              onChangeText={text => setCurrentAddress({ ...currentAddress, name: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Phone Number"
+              value={currentAddress.phone}
+              onChangeText={text => setCurrentAddress({ ...currentAddress, phone: text })}
+              keyboardType="phone-pad"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="House No, Building"
+              value={currentAddress.houseNo}
+              onChangeText={text => setCurrentAddress({ ...currentAddress, houseNo: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Street, Area"
+              value={currentAddress.street}
+              onChangeText={text => setCurrentAddress({ ...currentAddress, street: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="City"
+              value={currentAddress.city}
+              onChangeText={text => setCurrentAddress({ ...currentAddress, city: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="State"
+              value={currentAddress.state}
+              onChangeText={text => setCurrentAddress({ ...currentAddress, state: text })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Pincode"
+              value={currentAddress.pincode}
+              onChangeText={text => setCurrentAddress({ ...currentAddress, pincode: text })}
+              keyboardType="numeric"
+            />
+
             <View style={styles.modalActions}>
               <Button title="Cancel" onPress={() => setModalVisible(false)} color="#FF3B30" />
               <Button title="Save" onPress={handleSave} />
@@ -162,21 +200,22 @@ const ShippingAddressScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const stylesConfig = (colors) => StyleSheet.create({
   header: {
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: colors.border,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text,
   },
   scrollContainer: {
     padding: 10,
     paddingBottom: 80,
+    backgroundColor: colors.background,
   },
   footer: {
     position: 'absolute',
@@ -184,9 +223,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: colors.border,
   },
   buttonContainer: {
     marginTop: 20,
@@ -196,29 +235,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 50,
     fontSize: 16,
-    color: '#888',
+    color: colors.subText,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     padding: 15,
     borderRadius: 8,
     marginVertical: 8,
     marginHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colors.border,
   },
   selectedCard: {
-    borderColor: '#007AFF',
+    borderColor: colors.primary,
     borderWidth: 2,
   },
   cardTextName: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: colors.text,
   },
   cardText: {
     fontSize: 14,
-    color: '#666',
+    color: colors.subText,
     marginBottom: 3,
   },
   cardActions: {
@@ -235,7 +275,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    backgroundColor: "white",
+    backgroundColor: colors.card,
     borderRadius: 20,
     padding: 35,
     alignItems: "center",
@@ -259,8 +299,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginTop: 20,
     width: '100%',
+  },
+  input: {
+    width: '100%',
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    backgroundColor: '#f9f9f9'
   }
 });
 
 export default ShippingAddressScreen;
-

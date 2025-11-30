@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert, Share, Platform, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert, Platform, StatusBar } from 'react-native';
 import { useCart } from '../state/cartContext';
-import { API_URL } from '../config';
+import { API_BASE_URL as API_URL } from '../constants/api';
 import { useTheme } from '../theme/ThemeContext';
 import Container from '../components/layout/container';
 
@@ -49,7 +49,7 @@ const ProductDetailScreen = ({ route }) => {
             userName: 'Jane Smith',
             rating: 4,
             comment: 'Good quality, fast delivery.',
-            createdAt: new Date(Date.now() - 86400000).toISOString() // Yesterday
+            createdAt: new Date(Date.now() - 86400000).toISOString()
           }
         ];
         setReviews(mockReviews);
@@ -58,18 +58,18 @@ const ProductDetailScreen = ({ route }) => {
       }
 
       const response = await fetch(`${API_URL}/reviews?productId=${product.id}`);
-      
+
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         throw new Error('API did not return JSON');
       }
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch reviews');
       }
-      
+
       setReviews(data);
     } catch (error) {
       console.error('Error fetching reviews:', error);
@@ -104,7 +104,7 @@ const ProductDetailScreen = ({ route }) => {
           comment: reviewText,
           createdAt: new Date().toISOString()
         };
-        
+
         setReviews(prev => [newReview, ...prev]);
         setRating(0);
         setReviewText('');
@@ -140,34 +140,6 @@ const ProductDetailScreen = ({ route }) => {
     }
   };
 
-  const handleShare = () => {
-    const productUrl = `https://vishalmart.com/products/${product.id}`;
-    const message = `Check out ${product.name} on Vishal Mart: ${productUrl}`;
-    
-    Alert.alert(
-      'Share Product',
-      'Choose a platform to share',
-      [
-        {
-          text: 'WhatsApp',
-          onPress: () => Linking.openURL(`https://wa.me/?text=${encodeURIComponent(message)}`),
-        },
-        {
-          text: 'Twitter',
-          onPress: () => Linking.openURL(`https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`),
-        },
-        {
-          text: 'Facebook',
-          onPress: () => Linking.openURL(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`),
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ]
-    );
-  };
-
   return (
     <View style={themedStyles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.background} />
@@ -176,35 +148,32 @@ const ProductDetailScreen = ({ route }) => {
         <View style={themedStyles.detailsContainer}>
           <View style={themedStyles.headerRow}>
             <Text style={themedStyles.productName}>{product.name}</Text>
-            <TouchableOpacity style={themedStyles.shareButton} onPress={handleShare}>
-              <Text style={themedStyles.shareButtonText}>Share</Text>
-            </TouchableOpacity>
           </View>
           <Text style={themedStyles.price}>₹{product.price.toFixed(2)}</Text>
           <Text style={themedStyles.stock}>
             In Stock: <Text style={{ color: colors.primary }}>{availableStock}</Text>
           </Text>
           <Text style={themedStyles.description}>{product.description}</Text>
-          
+
           <View style={themedStyles.quantityContainer}>
             <Text style={themedStyles.quantityLabel}>Quantity:</Text>
             <View style={themedStyles.quantityControls}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[
-                  themedStyles.quantityButton, 
+                  themedStyles.quantityButton,
                   quantity === 0 && themedStyles.disabledButton
-                ]} 
+                ]}
                 onPress={decreaseQuantity}
                 disabled={quantity === 0}
               >
                 <Text style={themedStyles.quantityButtonText}>-</Text>
               </TouchableOpacity>
               <Text style={themedStyles.quantityText}>{quantity}</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[
-                  themedStyles.quantityButton, 
+                  themedStyles.quantityButton,
                   quantity >= availableStock && themedStyles.disabledButton
-                ]} 
+                ]}
                 onPress={increaseQuantity}
                 disabled={quantity >= availableStock}
               >
@@ -213,11 +182,11 @@ const ProductDetailScreen = ({ route }) => {
             </View>
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[
-              themedStyles.addToCartButton, 
+              themedStyles.addToCartButton,
               quantity === 0 && themedStyles.disabledAddToCart
-            ]} 
+            ]}
             onPress={handleAddToCart}
             disabled={quantity === 0}
           >
@@ -228,7 +197,7 @@ const ProductDetailScreen = ({ route }) => {
 
           <View style={themedStyles.reviewsSection}>
             <Text style={themedStyles.sectionTitle}>Product Reviews</Text>
-            
+
             {isLoading ? (
               <ActivityIndicator size="large" color={colors.primary} style={themedStyles.loadingIndicator} />
             ) : reviews.length > 0 ? (
@@ -255,7 +224,7 @@ const ProductDetailScreen = ({ route }) => {
               {[1, 2, 3, 4, 5].map((star) => (
                 <TouchableOpacity key={star} onPress={() => setRating(star)}>
                   <Text style={[
-                    themedStyles.star, 
+                    themedStyles.star,
                     { color: star <= rating ? colors.primary : colors.text + '80' }
                   ]}>
                     {star <= rating ? '★' : '☆'}
@@ -266,14 +235,14 @@ const ProductDetailScreen = ({ route }) => {
             <TextInput
               style={themedStyles.reviewInput}
               placeholder="Write your review here..."
-              placeholderTextColor={colors.text + '80'}
+              placeholderTextColor={colors.placeholder}
               value={reviewText}
               onChangeText={setReviewText}
               multiline
             />
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
-                themedStyles.submitButton, 
+                themedStyles.submitButton,
                 (!reviewText || rating === 0) && themedStyles.disabledButton
               ]}
               onPress={handleSubmitReview}
@@ -295,6 +264,7 @@ const createStyles = (colors) => ({
   },
   scrollView: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   image: {
     width: '100%',
@@ -318,19 +288,6 @@ const createStyles = (colors) => ({
     flex: 1,
     color: colors.text,
   },
-  shareButton: {
-    padding: 8,
-    backgroundColor: colors.card,
-    borderRadius: 20,
-    marginLeft: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  shareButtonText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: '500',
-  },
   price: {
     fontSize: 24,
     fontWeight: '700',
@@ -339,13 +296,13 @@ const createStyles = (colors) => ({
   },
   stock: {
     fontSize: 14,
-    color: colors.text + 'CC',
+    color: colors.subText,
     marginBottom: 20,
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    color: colors.text + 'E6',
+    color: colors.subText,
     marginBottom: 28,
   },
   quantityContainer: {
@@ -356,7 +313,7 @@ const createStyles = (colors) => ({
   },
   quantityLabel: {
     fontSize: 16,
-    color: colors.text + 'CC',
+    color: colors.subText,
   },
   quantityControls: {
     flexDirection: 'row',
@@ -383,7 +340,7 @@ const createStyles = (colors) => ({
     minWidth: 24,
     textAlign: 'center',
     color: colors.text,
-    backgroundColor: colors.background,
+    backgroundColor: colors.card,
     paddingVertical: 8,
   },
   addToCartButton: {
@@ -393,7 +350,7 @@ const createStyles = (colors) => ({
     alignItems: 'center',
     marginBottom: 28,
     elevation: 2,
-    shadowColor: colors.primary + '80',
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -442,11 +399,12 @@ const createStyles = (colors) => ({
   reviewText: {
     marginBottom: 12,
     lineHeight: 22,
-    color: colors.text + 'E6',
+    color: colors.subText,
   },
   reviewDate: {
     fontSize: 12,
-    color: colors.text + '99',
+    color: colors.subText,
+    opacity: 0.7,
   },
   ratingContainer: {
     flexDirection: 'row',
@@ -465,7 +423,7 @@ const createStyles = (colors) => ({
     marginBottom: 20,
     textAlignVertical: 'top',
     color: colors.text,
-    backgroundColor: colors.card,
+    backgroundColor: colors.inputBackground,
     fontSize: 16,
     lineHeight: 22,
   },
@@ -476,7 +434,7 @@ const createStyles = (colors) => ({
     alignItems: 'center',
     marginBottom: 16,
     elevation: 2,
-    shadowColor: colors.primary + '80',
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -503,6 +461,11 @@ const createStyles = (colors) => ({
     fontWeight: 'bold',
     marginLeft: 10,
   },
+  noReviewsText: {
+    color: colors.subText,
+    fontStyle: 'italic',
+    marginBottom: 20,
+  }
 });
 
 export default ProductDetailScreen;

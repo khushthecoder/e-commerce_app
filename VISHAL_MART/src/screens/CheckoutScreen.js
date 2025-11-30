@@ -5,11 +5,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Container from '../components/layout/container';
 import { useCart } from '../state/cartContext';
 import { useAuth } from '../state/authContext';
+import { useOrder } from '../state/orderContext';
 import api from '../constants/api';
+import { useTheme } from '../theme/ThemeContext';
 
 const CheckoutScreen = ({ navigation, route }) => {
   const { clearCart } = useCart();
   const { user } = useAuth();
+  const { addOrderForUser } = useOrder();
+  const { colors, createStyles } = useTheme();
+  const styles = createStyles(stylesConfig);
   const [loading, setLoading] = useState(false);
   const { cartItems = [], shippingAddress = {} } = route.params || {};
 
@@ -59,27 +64,25 @@ const CheckoutScreen = ({ navigation, route }) => {
     };
 
     try {
-      await api.post('/orders', orderData);
-      Alert.alert('Success', 'Order placed successfully!');
-    } catch (e) {
-      console.log("Backend failed, saving locally", e);
-      try {
-        const existingOrders = await AsyncStorage.getItem('local_orders');
-        const orders = existingOrders ? JSON.parse(existingOrders) : [];
-        orders.push(orderData);
-        await AsyncStorage.setItem('local_orders', JSON.stringify(orders));
-        Alert.alert('Success', 'Order placed (saved locally)!');
-      } catch (storageError) {
-        console.error("Storage error", storageError);
-        Alert.alert('Error', 'Failed to save order.');
-        setLoading(false);
-        return;
-      }
-    }
+      await addOrderForUser(user.id, orderData);
+      await clearCart();
 
-    clearCart();
-    setLoading(false);
-    navigation.navigate('Home');
+      Alert.alert(
+        'Success',
+        'Order placed successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Home')
+          }
+        ]
+      );
+    } catch (e) {
+      console.error("Order placement failed", e);
+      Alert.alert('Error', 'Failed to place order.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -98,7 +101,7 @@ const CheckoutScreen = ({ navigation, route }) => {
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>3. Payment Method</Text>
           <View style={styles.paymentBox}>
-            <MaterialIcons name="local-shipping" size={24} color="#28A745" />
+            <MaterialIcons name="local-shipping" size={24} color={colors.success} />
             <Text style={styles.paymentText}>Cash on Delivery (COD)</Text>
           </View>
           <Text style={styles.paymentNote}>Only COD is available for this order.</Text>
@@ -144,14 +147,136 @@ const CheckoutScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const stylesConfig = (colors) => ({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: colors.text,
+    textAlign: 'center',
+  },
+  summaryCard: {
+    backgroundColor: colors.card,
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  summaryLabel: {
+    fontSize: 16,
+    color: colors.subText,
+  },
+  summaryValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginTop: 10,
+  },
+  totalValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginTop: 10,
+  },
+  paymentSection: {
+    marginBottom: 30,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 15,
+    color: colors.text,
+  },
+  paymentMethod: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  paymentText: {
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: '500',
+    color: colors.text,
+  },
+  payButton: {
+    backgroundColor: colors.success,
+    padding: 18,
+    borderRadius: 12,
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: colors.success,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  payButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  successContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    padding: 20,
+  },
+  successText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.success,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  orderIdText: {
+    fontSize: 16,
+    color: colors.subText,
+    marginBottom: 30,
+  },
+  homeButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 25,
+  },
+  homeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  paymentNote: {
+    fontSize: 12,
+    color: colors.subText,
+  },
   scrollContent: {
     padding: 10,
     paddingBottom: 100,
-    backgroundColor: '#f5f5f5',
-  },
-  sectionCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
@@ -160,44 +285,40 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   addressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colors.border,
     paddingBottom: 5,
   },
   addressCard: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 15,
     marginRight: 10,
     width: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: colors.inputBackground,
   },
   addressName: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#007AFF',
+    color: colors.primary,
     marginBottom: 5,
   },
   addressDetailText: {
     fontSize: 14,
-    color: '#666',
+    color: colors.subText,
     lineHeight: 20,
   },
   noAddressText: {
     fontSize: 16,
-    color: '#888',
+    color: colors.subText,
     marginBottom: 15,
   },
   summaryList: {
@@ -208,40 +329,31 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#f9f9f9',
+    borderBottomColor: colors.border,
     alignItems: 'center',
   },
   itemName: {
     flex: 3,
     fontSize: 14,
-    color: '#555',
+    color: colors.text,
   },
   itemQty: {
     flex: 0.5,
     fontSize: 14,
     textAlign: 'center',
+    color: colors.text,
   },
   itemSubtotal: {
     flex: 1.5,
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'right',
+    color: colors.text,
   },
   paymentBox: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 5,
-  },
-  paymentText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 10,
-    color: '#28A745',
-  },
-  paymentNote: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 5,
   },
   priceRow: {
     flexDirection: 'row',
@@ -250,46 +362,49 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 15,
-    color: '#666',
+    color: colors.subText,
   },
   priceValue: {
     fontSize: 15,
     fontWeight: '600',
+    color: colors.text,
   },
   totalRow: {
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: colors.border,
     paddingTop: 10,
     marginTop: 5,
   },
   totalLabel: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: colors.text,
   },
   totalValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FF6347',
+    color: colors.danger,
   },
   footer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     padding: 15,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: colors.border,
     elevation: 8,
   },
   placeOrderButton: {
-    backgroundColor: '#FF9800',
+    backgroundColor: colors.warning,
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: colors.subText,
+    opacity: 0.5,
   },
   placeOrderButtonText: {
     color: '#fff',

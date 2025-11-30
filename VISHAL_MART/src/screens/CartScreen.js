@@ -5,8 +5,9 @@ import Container from '../components/layout/container';
 import { useCart } from '../state/cartContext';
 import { useAuth } from '../state/authContext';
 import { addressService } from '../utils/addressService';
+import { useTheme } from '../theme/ThemeContext';
 
-const CartItem = ({ item, onAddItem, onRemoveItem }) => {
+const CartItem = ({ item, onAddItem, onRemoveItem, styles, colors }) => {
   return (
     <View style={styles.cartItemContainer}>
       <View style={styles.itemDetails}>
@@ -38,6 +39,8 @@ const CartItem = ({ item, onAddItem, onRemoveItem }) => {
 const CartScreen = ({ navigation }) => {
   const { cartState, addItem, removeItem, clearCart } = useCart();
   const { items, totalAmount } = cartState;
+  const { colors, isDark, createStyles } = useTheme();
+  const styles = createStyles(stylesConfig);
 
   const [shippingAddress, setShippingAddress] = useState({
     name: '',
@@ -82,7 +85,7 @@ const CartScreen = ({ navigation }) => {
       <Text style={styles.savedAddressText}>{item.phone}</Text>
       {selectedAddressId === item.id && (
         <View style={styles.selectedBadge}>
-          <MaterialIcons name="check-circle" size={20} color="#4CAF50" />
+          <MaterialIcons name="check-circle" size={20} color={colors.success} />
         </View>
       )}
     </TouchableOpacity>
@@ -116,6 +119,8 @@ const CartScreen = ({ navigation }) => {
       item={item}
       onAddItem={addItem}
       onRemoveItem={removeItem}
+      styles={styles}
+      colors={colors}
     />
   );
 
@@ -126,13 +131,13 @@ const CartScreen = ({ navigation }) => {
           <Text style={styles.title}>Shopping Cart</Text>
         </View>
         <View style={styles.emptyCart}>
-          <MaterialIcons name="shopping-cart" size={80} color="#ccc" />
+          <MaterialIcons name="shopping-cart" size={80} color={colors.subText} />
           <Text style={styles.emptyText}>Your Cart is Empty!</Text>
           <Text style={styles.emptySubText}>Add some products from the Home screen.</Text>
           <Button
             title="Browse Products"
             onPress={() => navigation.navigate('HomeStack')}
-            color="#007AFF"
+            color={colors.primary}
           />
         </View>
       </Container>
@@ -178,12 +183,14 @@ const CartScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Full Name"
+            placeholderTextColor={colors.placeholder}
             value={shippingAddress.name}
             onChangeText={(text) => setShippingAddress(prev => ({ ...prev, name: text }))}
           />
           <TextInput
             style={[styles.input, styles.multilineInput]}
             placeholder="Full Address"
+            placeholderTextColor={colors.placeholder}
             value={shippingAddress.address}
             onChangeText={(text) => setShippingAddress(prev => ({ ...prev, address: text }))}
             multiline
@@ -193,6 +200,7 @@ const CartScreen = ({ navigation }) => {
             <TextInput
               style={[styles.input, styles.halfInput]}
               placeholder="Pincode"
+              placeholderTextColor={colors.placeholder}
               value={shippingAddress.pincode}
               onChangeText={(text) => setShippingAddress(prev => ({ ...prev, pincode: text }))}
               keyboardType="numeric"
@@ -201,6 +209,7 @@ const CartScreen = ({ navigation }) => {
             <TextInput
               style={[styles.input, styles.halfInput]}
               placeholder="Phone Number"
+              placeholderTextColor={colors.placeholder}
               value={shippingAddress.phone}
               onChangeText={(text) => setShippingAddress(prev => ({ ...prev, phone: text }))}
               keyboardType="phone-pad"
@@ -212,7 +221,7 @@ const CartScreen = ({ navigation }) => {
         <Button
           title="Proceed to Checkout"
           onPress={handleCheckout}
-          color="#4CAF50"
+          color={colors.success}
           disabled={items.length === 0}
         />
 
@@ -228,17 +237,17 @@ const CartScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const stylesConfig = (colors) => ({
   header: {
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: colors.border,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text,
   },
   listContainer: {
     paddingHorizontal: 10,
@@ -251,13 +260,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     marginBottom: 8,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   itemDetails: {
     flex: 1,
@@ -266,18 +277,18 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text,
   },
   itemPrice: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: colors.primary,
     marginTop: 4,
   },
   quantityControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.inputBackground,
     borderRadius: 5,
     padding: 2,
   },
@@ -289,16 +300,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   removeButton: {
-    backgroundColor: '#FF6347',
+    backgroundColor: colors.danger,
   },
   addButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: colors.success,
   },
   itemQuantity: {
     marginHorizontal: 10,
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text,
     minWidth: 20,
     textAlign: 'center',
   },
@@ -306,8 +317,8 @@ const styles = StyleSheet.create({
   summaryContainer: {
     padding: 15,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
-    backgroundColor: '#fff',
+    borderTopColor: colors.border,
+    backgroundColor: colors.card,
   },
   totalRow: {
     flexDirection: 'row',
@@ -317,12 +328,12 @@ const styles = StyleSheet.create({
   totalText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text,
   },
   totalPrice: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text,
   },
   clearButton: {
     marginTop: 10,
@@ -330,26 +341,27 @@ const styles = StyleSheet.create({
   },
   addressContainer: {
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     marginVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: colors.border,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333',
+    color: colors.text,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colors.border,
     padding: 12,
     borderRadius: 5,
     marginBottom: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: colors.inputBackground,
     fontSize: 14,
+    color: colors.text,
   },
   multilineInput: {
     minHeight: 80,
@@ -366,7 +378,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   clearButtonText: {
-    color: '#FF6347',
+    color: colors.danger,
     fontSize: 14,
     fontWeight: '500',
   },
@@ -376,17 +388,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: colors.background,
   },
   emptyText: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#555',
+    color: colors.text,
     marginTop: 15,
     marginBottom: 5,
   },
   emptySubText: {
     fontSize: 16,
-    color: '#888',
+    color: colors.subText,
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -397,24 +410,25 @@ const styles = StyleSheet.create({
     width: 200,
     padding: 12,
     marginRight: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: colors.inputBackground,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colors.border,
   },
   selectedAddressCard: {
-    borderColor: '#4CAF50',
-    backgroundColor: '#e8f5e9',
+    borderColor: colors.success,
+    backgroundColor: colors.card,
+    borderWidth: 2,
   },
   savedAddressName: {
     fontWeight: 'bold',
     fontSize: 14,
     marginBottom: 4,
-    color: '#333',
+    color: colors.text,
   },
   savedAddressText: {
     fontSize: 12,
-    color: '#666',
+    color: colors.subText,
     marginBottom: 2,
   },
   selectedBadge: {
@@ -424,7 +438,7 @@ const styles = StyleSheet.create({
   },
   noSavedAddressText: {
     fontSize: 14,
-    color: '#888',
+    color: colors.subText,
     fontStyle: 'italic',
     marginBottom: 10,
   }

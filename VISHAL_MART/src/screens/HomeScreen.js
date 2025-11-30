@@ -27,8 +27,6 @@ const generateDummyProducts = () => {
     const nounList = nouns[category];
     const noun = nounList[i % nounList.length];
     const adj = adjectives[i % adjectives.length];
-
-    // Get curated image for the specific noun
     const nounImages = PRODUCT_IMAGES[noun] || [];
     const image = nounImages.length > 0
       ? nounImages[i % nounImages.length]
@@ -204,10 +202,12 @@ const stylesConfig = (colors) => ({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    backgroundColor: colors.light,
+    backgroundColor: colors.inputBackground,
+    color: colors.text,
+    flex: 1,
   },
   categoryContainer: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.background,
     paddingVertical: 10,
     paddingHorizontal: 5,
     marginBottom: 5,
@@ -217,15 +217,23 @@ const stylesConfig = (colors) => ({
     paddingVertical: 8,
     borderRadius: 15,
     marginHorizontal: 5,
-    backgroundColor: colors.light,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   categoryButtonActive: {
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   categoryText: {
     color: colors.text,
     fontWeight: '500',
     opacity: 0.9,
+  },
+  categoryTextActive: {
+    color: '#fff',
+    fontWeight: 'bold',
+    opacity: 1,
   },
   selectedCat: {
     color: colors.text,
@@ -247,7 +255,7 @@ const stylesConfig = (colors) => ({
     marginTop: 20,
   },
   logoutButton: {
-    color: colors.text,
+    color: colors.primary,
     fontSize: 16,
     fontWeight: 'bold',
     marginRight: 10,

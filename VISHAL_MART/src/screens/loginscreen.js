@@ -1,12 +1,14 @@
-// src/screens/LoginScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from '../state/authContext';
+import { useTheme } from '../theme/ThemeContext';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, isLoading } = useAuth();
+  const { colors, createStyles } = useTheme();
+  const styles = createStyles(stylesConfig);
 
   const handleLogin = async () => {
     try {
@@ -22,6 +24,7 @@ const LoginScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor={colors.placeholder}
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
@@ -30,42 +33,80 @@ const LoginScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Password"
+        placeholderTextColor={colors.placeholder}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
       {isLoading ? (
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       ) : (
-        <Button title="Login" onPress={handleLogin} />
+        <Button title="Login" onPress={handleLogin} color={colors.primary} />
       )}
-      <Button
-        title="Don't have an account? Register"
-        onPress={() => navigation.navigate('Register')}
-      />
+      <View style={styles.registerContainer}>
+        <Button
+          title="Don't have an account? Register"
+          onPress={() => navigation.navigate('Register')}
+          color={colors.secondary}
+        />
+      </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const stylesConfig = (colors) => ({
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: colors.background,
   },
   title: {
-    fontSize: 24,
-    marginBottom: 20,
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 30,
     textAlign: 'center',
+    color: colors.text,
+  },
+  inputContainer: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: colors.text,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    borderColor: colors.border,
+    padding: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    backgroundColor: colors.inputBackground,
+    color: colors.text,
   },
+  buttonContainer: {
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  linkContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  linkText: {
+    fontSize: 16,
+    color: colors.subText,
+  },
+  link: {
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: 'bold',
+    marginLeft: 5,
+  },
+  registerContainer: {
+    marginTop: 15,
+  }
 });
 
 export default LoginScreen;

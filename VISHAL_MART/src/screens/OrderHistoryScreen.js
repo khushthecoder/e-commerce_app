@@ -1,226 +1,276 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Container from '../components/layout/container';
+import { useAuth } from '../state/authContext';
+import { useOrder } from '../state/orderContext';
+import { useTheme } from '../theme/ThemeContext';
 
-const mockOrders = [
-  {
-    id: 'ORD-1001',
-    date: '10 Nov 2025',
-    totalAmount: 1250.00,
-    status: 'Delivered',
-    itemsCount: 3,
-    deliveryDate: '15 Nov 2025',
-  },
-  {
-    id: 'ORD-1002',
-    date: '15 Nov 2025',
-    totalAmount: 599.50,
-    status: 'Shipped',
-    itemsCount: 2,
-    deliveryDate: '20 Nov 2025',
-  },
-  {
-    id: 'ORD-1003',
-    date: '17 Nov 2025',
-    totalAmount: 3200.00,
-    status: 'Processing',
-    itemsCount: 5,
-    deliveryDate: '24 Nov 2025',
-  },
-];
-
-const getStatusStyle = (status) => {
-    switch (status) {
-        case 'Delivered':
-            return { color: '#4CAF50', icon: 'check-circle' };
-        case 'Shipped':
-            return { color: '#007AFF', icon: 'local-shipping' };
-        case 'Processing':
-            return { color: '#FF9800', icon: 'access-time' };
-        case 'Cancelled':
-            return { color: '#FF6347', icon: 'cancel' };
-        default:
-            return { color: '#888', icon: 'info-outline' };
-    }
+const getStatusColor = (status, colors) => {
+  switch (status) {
+    case 'Delivered':
+      return colors.success;
+    case 'Shipped':
+      return colors.primary;
+    case 'Processing':
+      return colors.warning;
+    case 'Cancelled':
+      return colors.danger;
+    default:
+      return colors.subText;
+  }
 };
 
-const OrderCard = ({ order, navigation }) => {
-    const statusInfo = getStatusStyle(order.status);
-    
-    const handlePress = () => {
-        console.log(`Navigating to details for Order ID: ${order.id}`);
-    };
+const getStatusIcon = (status) => {
+  switch (status) {
+    case 'Delivered':
+      return 'check-circle';
+    case 'Shipped':
+      return 'local-shipping';
+    case 'Processing':
+      return 'access-time';
+    case 'Cancelled':
+      return 'cancel';
+    default:
+      return 'info-outline';
+  }
+};
 
-    return (
-        <TouchableOpacity style={styles.card} onPress={handlePress}>
-            <View style={styles.headerRow}>
-                <Text style={styles.orderIdText}>ID: {order.id}</Text>
-                <View style={styles.statusPill}>
-                    <MaterialIcons 
-                        name={statusInfo.icon} 
-                        size={14} 
-                        color={statusInfo.color} 
-                        style={styles.statusIcon} 
-                    />
-                    <Text style={[styles.statusText, { color: statusInfo.color }]}>
-                        {order.status}
-                    </Text>
-                </View>
-            </View>
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  });
+};
 
-            <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Order Date:</Text>
-                <Text style={styles.detailValue}>{order.date}</Text>
-            </View>
+const OrderCard = ({ order, styles, colors }) => {
+  const statusColor = getStatusColor(order.status, colors);
+  const statusIcon = getStatusIcon(order.status);
+  const badgeBackgroundColor = statusColor + '20'; 
 
-            <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Items:</Text>
-                <Text style={styles.detailValue}>{order.itemsCount}</Text>
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.orderId}>ID: {order.id}</Text>
+        <View style={[styles.statusBadge, { backgroundColor: badgeBackgroundColor }]}>
+          <MaterialIcons name={statusIcon} size={14} color={statusColor} />
+          <Text style={[styles.statusText, { color: statusColor }]}>{order.status}</Text>
+        </View>
+      </View>
+      <Text style={styles.dateText}>{formatDate(order.date)}</Text>
+      <View style={styles.divider} />
+      <View style={styles.itemsContainer}>
+        <Text style={styles.sectionLabel}>Items:</Text>
+        {order.items && order.items.length > 0 ? (
+          order.items.map((item, index) => (
+            <View key={index} style={styles.itemRow}>
+              <Text style={styles.itemName}>
+                {item.name} <Text style={styles.itemQty}>x{item.quantity}</Text>
+              </Text>
             </View>
-            
-            <View style={[styles.detailRow, styles.totalRow]}>
-                <Text style={styles.totalLabel}>Total Amount:</Text>
-                <Text style={styles.totalAmountText}>₹{order.totalAmount.toFixed(2)}</Text>
-            </View>
-        </TouchableOpacity>
-    );
+          ))
+        ) : (
+          <Text style={styles.itemText}>{order.itemsCount} items</Text>
+        )}
+      </View>
+
+      <View style={styles.divider} />
+      <View style={styles.footer}>
+        <Text style={styles.totalLabel}>Total Amount</Text>
+        <Text style={styles.totalAmount}>₹{order.totalAmount?.toFixed(2)}</Text>
+      </View>
+    </View>
+  );
 };
 
 const OrderHistoryScreen = ({ navigation }) => {
-  const orders = mockOrders; 
+  const { user } = useAuth();
+  const { orders, getOrdersForUser, isLoading } = useOrder();
+  const { colors, createStyles } = useTheme();
+  const styles = createStyles(stylesConfig);
+
+  useEffect(() => {
+    if (user?.id) {
+      getOrdersForUser(user.id);
+    }
+  }, [user, getOrdersForUser]);
+
+  const userOrders = orders[user?.id] || [];
 
   return (
     <Container>
-      <View style={styles.header}>
-        <Text style={styles.title}>Your Previous Orders</Text>
-      </View>
-      
-      {orders.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <MaterialIcons name="receipt-long" size={80} color="#ccc" />
-          <Text style={styles.emptyText}>Abhi Koi Order Nahi Mila.</Text>
-          <Text style={styles.emptySubText}>Shopping shuru karne ke liye Home par jaayein.</Text>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.screenTitle}>Order History</Text>
         </View>
-      ) : (
-        <FlatList
-          data={orders}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <OrderCard order={item} navigation={navigation} />}
-          contentContainerStyle={styles.listContainer}
-        />
-      )}
+
+        {isLoading && userOrders.length === 0 ? (
+          <View style={styles.centerContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : userOrders.length === 0 ? (
+          <View style={styles.centerContainer}>
+            <MaterialIcons name="receipt-long" size={64} color={colors.subText} />
+            <Text style={styles.emptyTitle}>No Orders Yet</Text>
+            <Text style={styles.emptySubtitle}>Start shopping to see your orders here.</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={userOrders}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <OrderCard
+                order={item}
+                styles={styles}
+                colors={colors}
+              />
+            )}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </View>
     </Container>
   );
 };
 
-const styles = StyleSheet.create({
-  header: {
-    padding: 15,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+const stylesConfig = (colors) => ({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
   },
-  title: {
+  headerContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.background,
+  },
+  screenTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text,
   },
-  listContainer: {
-    padding: 10,
+  listContent: {
+    padding: 16,
+    paddingBottom: 40,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    borderLeftWidth: 5,
-    borderLeftColor: '#FF9800',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-    paddingBottom: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  orderIdText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#333',
-  },
-  statusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 15,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  statusIcon: {
-      marginRight: 4,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 3,
-  },
-  detailLabel: {
-    fontSize: 14,
-    color: '#555',
-  },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-  totalRow: {
-      marginTop: 8,
-      borderTopWidth: 1,
-      borderTopColor: '#ddd',
-      paddingTop: 8,
-  },
-  totalLabel: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#333',
-  },
-  totalAmountText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-  },
-  emptyContainer: {
+  centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
-  emptyText: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#555',
-    marginTop: 15,
-    marginBottom: 5,
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginTop: 16,
   },
-  emptySubText: {
+  emptySubtitle: {
     fontSize: 16,
-    color: '#888',
-    marginBottom: 20,
+    color: colors.subText,
+    marginTop: 8,
     textAlign: 'center',
-  }
+  },
+
+  // Card Styles
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  orderId: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    fontFamily: 'System', 
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12, 
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 4,
+    textTransform: 'capitalize',
+  },
+  dateText: {
+    fontSize: 14,
+    color: colors.subText,
+    marginBottom: 12,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginVertical: 12,
+  },
+  itemsContainer: {
+    marginBottom: 4,
+  },
+  sectionLabel: {
+    fontSize: 12,
+    color: colors.subText,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  itemRow: {
+    marginBottom: 4,
+  },
+  itemName: {
+    fontSize: 15,
+    color: colors.text,
+    lineHeight: 20,
+  },
+  itemQty: {
+    color: colors.subText,
+    fontWeight: 'normal',
+  },
+  itemText: {
+    fontSize: 15,
+    color: colors.text,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  totalLabel: {
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '500',
+  },
+  totalAmount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.primary,
+  },
 });
 
 export default OrderHistoryScreen;
