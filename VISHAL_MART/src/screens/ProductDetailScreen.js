@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert, Share, Platform, Linking, TextInput } from 'react-native';
-import { MaterialIcons, FontAwesome, Ionicons } from '@expo/vector-icons';
-import Container from '../components/layout/container';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert, Share, Platform, StatusBar } from 'react-native';
 import { useCart } from '../state/cartContext';
 import { API_URL } from '../config';
+import { useTheme } from '../theme/ThemeContext';
+import Container from '../components/layout/container';
 
 const ProductDetailScreen = ({ route }) => {
   const { product } = route.params;
   const { addItem } = useCart();
-  const [quantity, setQuantity] = useState(1);
+  const { colors, createStyles: createThemedStyles } = useTheme();
+  const themedStyles = createThemedStyles(createStyles);
+  const [quantity, setQuantity] = useState(0);
   const [availableStock, setAvailableStock] = useState(product.stock);
   const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(0);
@@ -16,7 +18,7 @@ const ProductDetailScreen = ({ route }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const decreaseQuantity = () => {
-    if (quantity > 1) {
+    if (quantity > 0) {
       setQuantity(prev => prev - 1);
     }
   };
@@ -37,17 +39,17 @@ const ProductDetailScreen = ({ route }) => {
         const mockReviews = [
           {
             id: 1,
-            username: 'John Doe',
+            userName: 'John Doe',
             rating: 5,
             comment: 'Great product! Works as expected.',
-            date: new Date().toISOString()
+            createdAt: new Date().toISOString()
           },
           {
             id: 2,
-            username: 'Jane Smith',
+            userName: 'Jane Smith',
             rating: 4,
             comment: 'Good quality, fast delivery.',
-            date: new Date(Date.now() - 86400000).toISOString() // Yesterday
+            createdAt: new Date(Date.now() - 86400000).toISOString() // Yesterday
           }
         ];
         setReviews(mockReviews);
@@ -97,10 +99,10 @@ const ProductDetailScreen = ({ route }) => {
       if (__DEV__) {
         const newReview = {
           id: Date.now(),
-          username: 'You',
+          userName: 'You',
           rating,
           comment: reviewText,
-          date: new Date().toISOString()
+          createdAt: new Date().toISOString()
         };
         
         setReviews(prev => [newReview, ...prev]);
@@ -118,7 +120,7 @@ const ProductDetailScreen = ({ route }) => {
           productId: product.id,
           rating,
           comment: reviewText,
-          date: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
         }),
       });
 
@@ -136,18 +138,6 @@ const ProductDetailScreen = ({ route }) => {
       console.error('Error submitting review:', error);
       Alert.alert('Error', error.message || 'Failed to submit review. Please try again.');
     }
-  };
-
-  const renderStars = (rating) => {
-    return [1, 2, 3, 4, 5].map((star) => (
-      <Ionicons
-        key={star}
-        name={star <= rating ? 'star' : 'star-outline'}
-        size={20}
-        color={star <= rating ? '#FFD700' : '#ccc'}
-        style={styles.starIcon}
-      />
-    ));
   };
 
   const handleShare = () => {
@@ -179,306 +169,328 @@ const ProductDetailScreen = ({ route }) => {
   };
 
   return (
-    <Container>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Image
-          style={styles.productImage}
-          source={{ uri: product.image }}
-        />
-
-        <View style={styles.detailsContainer}>
-          <View style={styles.headerRow}>
-            <Text style={styles.productName}>{product.name}</Text>
-            <TouchableOpacity onPress={handleShare} style={styles.shareButton}>
-              <FontAwesome name="share-alt" size={24} color="#007AFF" />
+    <View style={themedStyles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <ScrollView style={themedStyles.scrollView}>
+        <Image source={{ uri: product.image }} style={themedStyles.image} />
+        <View style={themedStyles.detailsContainer}>
+          <View style={themedStyles.headerRow}>
+            <Text style={themedStyles.productName}>{product.name}</Text>
+            <TouchableOpacity style={themedStyles.shareButton} onPress={handleShare}>
+              <Text style={themedStyles.shareButtonText}>Share</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.productPrice}>₹{product.price}</Text>
-          <Text style={styles.stockInfo}>
-            Available Stock: {availableStock - quantity + 1}
+          <Text style={themedStyles.price}>₹{product.price.toFixed(2)}</Text>
+          <Text style={themedStyles.stock}>
+            In Stock: <Text style={{ color: colors.primary }}>{availableStock}</Text>
           </Text>
-
-          <View style={styles.separator} />
-
-          <Text style={styles.sectionTitle}>Description</Text>
-          <Text style={styles.productDescription}>
-            {product.description}
-          </Text>
-
-          <View style={styles.separator} />
-
-          <Text style={styles.sectionTitle}>Quantity</Text>
-          <View style={styles.quantityControl}>
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={decreaseQuantity}
-              disabled={quantity === 0}
-            >
-              <MaterialIcons name="remove" size={24} color={quantity === 0 ? '#ccc' : '#333'} />
-            </TouchableOpacity>
-
-            <Text style={styles.quantityText}>{quantity}</Text>
-
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={increaseQuantity}
-            >
-              <MaterialIcons name="add" size={24} color="#333" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.separator} />
-
-          <Text style={styles.sectionTitle}>Customer Reviews</Text>
+          <Text style={themedStyles.description}>{product.description}</Text>
           
-          {!isLoading && reviews.length === 0 ? (
-            <View style={styles.noReviewsContainer}>
-              <Text style={styles.noReviewsText}>No reviews yet. Be the first to review!</Text>
-              {__DEV__ && (
-                <Text style={styles.devNote}>(Using demo data in development mode)</Text>
-              )}
+          <View style={themedStyles.quantityContainer}>
+            <Text style={themedStyles.quantityLabel}>Quantity:</Text>
+            <View style={themedStyles.quantityControls}>
+              <TouchableOpacity 
+                style={[
+                  themedStyles.quantityButton, 
+                  quantity === 0 && themedStyles.disabledButton
+                ]} 
+                onPress={decreaseQuantity}
+                disabled={quantity === 0}
+              >
+                <Text style={themedStyles.quantityButtonText}>-</Text>
+              </TouchableOpacity>
+              <Text style={themedStyles.quantityText}>{quantity}</Text>
+              <TouchableOpacity 
+                style={[
+                  themedStyles.quantityButton, 
+                  quantity >= availableStock && themedStyles.disabledButton
+                ]} 
+                onPress={increaseQuantity}
+                disabled={quantity >= availableStock}
+              >
+                <Text style={themedStyles.quantityButtonText}>+</Text>
+              </TouchableOpacity>
             </View>
-          ) : (
-            reviews.map((review) => (
-              <View key={review.id} style={styles.reviewItem}>
-                <View style={styles.reviewHeader}>
-                  <Text style={styles.reviewUsername}>{review.username || 'Anonymous'}</Text>
-                  <View style={styles.reviewRating}>
-                    {renderStars(review.rating)}
+          </View>
+
+          <TouchableOpacity 
+            style={[
+              themedStyles.addToCartButton, 
+              quantity === 0 && themedStyles.disabledAddToCart
+            ]} 
+            onPress={handleAddToCart}
+            disabled={quantity === 0}
+          >
+            <Text style={themedStyles.addToCartButtonText}>
+              {quantity === 0 ? 'Select Quantity' : `Add to Cart (${quantity})`}
+            </Text>
+          </TouchableOpacity>
+
+          <View style={themedStyles.reviewsSection}>
+            <Text style={themedStyles.sectionTitle}>Product Reviews</Text>
+            
+            {isLoading ? (
+              <ActivityIndicator size="large" color={colors.primary} style={themedStyles.loadingIndicator} />
+            ) : reviews.length > 0 ? (
+              <>
+                {reviews.map((review, index) => (
+                  <View key={index} style={themedStyles.reviewItem}>
+                    <View style={themedStyles.reviewHeader}>
+                      <Text style={themedStyles.reviewAuthor}>{review.userName || 'Anonymous'}</Text>
+                      <Text style={themedStyles.reviewRating}>★ {review.rating}/5</Text>
+                    </View>
+                    <Text style={themedStyles.reviewText}>{review.comment}</Text>
+                    <Text style={themedStyles.reviewDate}>
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </Text>
                   </View>
-                </View>
-                <Text style={styles.reviewDate}>
-                  {new Date(review.date).toLocaleDateString()}
-                </Text>
-                <Text style={styles.reviewText}>{review.comment}</Text>
-              </View>
-            ))
-          )}
+                ))}
+              </>
+            ) : (
+              <Text style={themedStyles.noReviewsText}>No reviews yet. Be the first to review!</Text>
+            )}
 
-          <View style={styles.separator} />
-
-          <Text style={styles.sectionTitle}>Write a Review</Text>
-          <View style={styles.ratingContainer}>
-            <Text style={styles.ratingLabel}>Your Rating:</Text>
-            <View style={styles.starsContainer}>
+            <Text style={themedStyles.sectionTitle}>Write a Review</Text>
+            <View style={themedStyles.ratingContainer}>
               {[1, 2, 3, 4, 5].map((star) => (
-                <TouchableOpacity
-                  key={star}
-                  onPress={() => setRating(star)}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons
-                    name={star <= rating ? 'star' : 'star-outline'}
-                    size={32}
-                    color={star <= rating ? '#FFD700' : '#ccc'}
-                  />
+                <TouchableOpacity key={star} onPress={() => setRating(star)}>
+                  <Text style={[
+                    themedStyles.star, 
+                    { color: star <= rating ? colors.primary : colors.text + '80' }
+                  ]}>
+                    {star <= rating ? '★' : '☆'}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
+            <TextInput
+              style={themedStyles.reviewInput}
+              placeholder="Write your review here..."
+              placeholderTextColor={colors.text + '80'}
+              value={reviewText}
+              onChangeText={setReviewText}
+              multiline
+            />
+            <TouchableOpacity 
+              style={[
+                themedStyles.submitButton, 
+                (!reviewText || rating === 0) && themedStyles.disabledButton
+              ]}
+              onPress={handleSubmitReview}
+              disabled={!reviewText || rating === 0}
+            >
+              <Text style={themedStyles.submitButtonText}>Submit Review</Text>
+            </TouchableOpacity>
           </View>
-
-          <TextInput
-            style={styles.reviewInput}
-            placeholder="Write your review here..."
-            multiline
-            numberOfLines={4}
-            value={reviewText}
-            onChangeText={setReviewText}
-          />
-
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={handleSubmitReview}
-          >
-            <Text style={styles.submitButtonText}>Submit Review</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
-
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.cartButton} onPress={handleAddToCart}>
-          <MaterialIcons name="shopping-cart" size={24} color="#fff" />
-          <Text style={styles.cartButtonText}>
-            Add to Cart (₹{(product.price * quantity).toFixed(2)})
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </Container>
+    </View>
   );
 }
-const styles = StyleSheet.create({
-  scrollContent: {
-    paddingBottom: 100,
-    backgroundColor: '#fff',
+
+const createStyles = (colors) => ({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
   },
-  productImage: {
+  scrollView: {
+    flex: 1,
+  },
+  image: {
     width: '100%',
     height: 300,
     resizeMode: 'cover',
-    marginBottom: 10,
+    backgroundColor: colors.card,
   },
   detailsContainer: {
-    paddingHorizontal: 20,
+    padding: 16,
+    backgroundColor: colors.background,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 5,
-  },
-  shareButton: {
-    padding: 8,
-    marginLeft: 10,
+    marginBottom: 12,
   },
   productName: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '600',
     flex: 1,
+    color: colors.text,
   },
-  productPrice: {
-    fontSize: 22,
+  shareButton: {
+    padding: 8,
+    backgroundColor: colors.card,
+    borderRadius: 20,
+    marginLeft: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  shareButtonText: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  price: {
+    fontSize: 24,
     fontWeight: '700',
-    color: '#007AFF',
-    marginBottom: 5,
+    color: colors.primary,
+    marginBottom: 8,
   },
-  stockInfo: {
+  stock: {
+    fontSize: 14,
+    color: colors.text + 'CC',
+    marginBottom: 20,
+  },
+  description: {
     fontSize: 16,
-    color: '#666',
-    marginTop: 5,
-    marginBottom: 15,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#f0f0f0',
-    marginVertical: 15,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#555',
-    marginBottom: 10,
-  },
-  productDescription: {
-    fontSize: 16,
-    color: '#666',
     lineHeight: 24,
+    color: colors.text + 'E6',
+    marginBottom: 28,
   },
-  quantityControl: {
+  quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    marginBottom: 28,
+    justifyContent: 'space-between',
   },
-  quantityButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
+  quantityLabel: {
+    fontSize: 16,
+    color: colors.text + 'CC',
+  },
+  quantityControls: {
+    flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colors.border,
     borderRadius: 8,
-    marginHorizontal: 10,
+    overflow: 'hidden',
+    backgroundColor: colors.card,
+  },
+  quantityButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: colors.card,
+  },
+  quantityButtonText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.text,
   },
   quantityText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    paddingHorizontal: 16,
+    fontSize: 16,
+    minWidth: 24,
+    textAlign: 'center',
+    color: colors.text,
+    backgroundColor: colors.background,
+    paddingVertical: 8,
+  },
+  addToCartButton: {
+    backgroundColor: colors.primary,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 28,
+    elevation: 2,
+    shadowColor: colors.primary + '80',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  addToCartButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  disabledAddToCart: {
+    backgroundColor: colors.primary + '80',
+  },
+  reviewsSection: {
+    marginTop: 8,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 20,
+    color: colors.text,
   },
   reviewItem: {
-    marginBottom: 20,
-    padding: 15,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
+    padding: 16,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   reviewHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: 8,
   },
-  reviewUsername: {
-    fontWeight: 'bold',
-    fontSize: 16,
+  reviewAuthor: {
+    fontWeight: '600',
+    color: colors.text,
   },
   reviewRating: {
-    flexDirection: 'row',
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  reviewText: {
+    marginBottom: 12,
+    lineHeight: 22,
+    color: colors.text + 'E6',
   },
   reviewDate: {
     fontSize: 12,
-    color: '#888',
-    marginBottom: 8,
-  },
-  reviewText: {
-    fontSize: 14,
-    color: '#333',
-    lineHeight: 20,
-  },
-  noReviewsContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  noReviewsText: {
-    fontStyle: 'italic',
-    color: '#888',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  devNote: {
-    fontSize: 12,
-    color: '#aaa',
-    textAlign: 'center',
-    fontStyle: 'italic',
+    color: colors.text + '99',
   },
   ratingContainer: {
-    marginBottom: 15,
-  },
-  ratingLabel: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#555',
-  },
-  starsContainer: {
     flexDirection: 'row',
+    marginBottom: 20,
   },
-  starIcon: {
-    marginRight: 4,
+  star: {
+    fontSize: 28,
+    marginRight: 8,
   },
   reviewInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 14,
-    minHeight: 100,
+    borderColor: colors.border,
+    borderRadius: 12,
+    padding: 16,
+    minHeight: 120,
+    marginBottom: 20,
     textAlignVertical: 'top',
-    marginBottom: 15,
+    color: colors.text,
+    backgroundColor: colors.card,
+    fontSize: 16,
+    lineHeight: 22,
   },
   submitButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: colors.primary + '80',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
   submitButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
     fontSize: 16,
+    fontWeight: '600',
   },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    elevation: 5,
+  disabledButton: {
+    opacity: 0.6,
   },
-  cartButton: {
-    backgroundColor: '#28A745',
+  loadingIndicator: {
+    marginVertical: 32,
     borderRadius: 10,
     padding: 15,
     flexDirection: 'row',
