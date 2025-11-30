@@ -5,19 +5,19 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ActivityIndicator, View, StyleSheet, StatusBar, Platform } from 'react-native';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
-
 import HomeScreen from './src/screens/HomeScreen';
 import CartScreen from './src/screens/CartScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import LoginScreen from './src/screens/loginscreen';
 import SignUpScreen from './src/screens/signupscreen';
-import DebugAuthScreen from './src/screens/DebugAuthScreen';
 import ProductDetailScreen from './src/screens/ProductDetailScreen';
 import CheckoutScreen from './src/screens/CheckoutScreen';
 import { AuthProvider, useAuth } from './src/state/authContext';
 import { CartProvider } from './src/state/cartContext';
+import { OrderProvider } from './src/state/orderContext';
 import OrderHistoryScreen from './src/screens/OrderHistoryScreen';
 import ShippingAddressScreen from './src/screens/ShippingAddressScreen';
+import EditProfileScreen from './src/screens/EditProfileScreen';
 
 const Tab = createBottomTabNavigator();
 const AuthStackScreen = createStackNavigator();
@@ -52,13 +52,25 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="OrderHistory" component={OrderHistoryScreen} options={{ title: 'Order History' }} />
       <ProfileStack.Screen name="ShippingAddress" component={ShippingAddressScreen} options={{ title: 'Shipping Addresses' }} />
+      <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
     </ProfileStack.Navigator>
   );
 };
 
 const MainTabNavigator = () => {
+  const { colors, isDark } = useTheme();
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.subText,
+      }}
+    >
       <Tab.Screen name="Home" component={HomeStackNavigator} />
       <Tab.Screen name="Cart" component={CartStackNavigator} />
       <Tab.Screen name="Profile" component={ProfileStackNavigator} />
@@ -71,7 +83,6 @@ const AuthStack = () => {
     <AuthStackScreen.Navigator screenOptions={{ headerShown: false }}>
       <AuthStackScreen.Screen name="Login" component={LoginScreen} />
       <AuthStackScreen.Screen name="Register" component={SignUpScreen} />
-      <AuthStackScreen.Screen name="DebugAuth" component={DebugAuthScreen} />
     </AuthStackScreen.Navigator>
   );
 };
@@ -101,14 +112,12 @@ const AppNavigation = () => {
     );
   }
 
-  // Set the status bar style based on theme
-  StatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content');
-  if (Platform.OS === 'android') {
-    StatusBar.setBackgroundColor(colors.background);
-  }
-
   return (
     <NavigationContainer theme={navigationTheme}>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+      />
       {userToken ? <MainTabNavigator /> : <AuthStack />}
     </NavigationContainer>
   );
@@ -119,9 +128,11 @@ export default function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AuthProvider>
-          <CartProvider>
-            <AppNavigation />
-          </CartProvider>
+          <OrderProvider>
+            <CartProvider>
+              <AppNavigation />
+            </CartProvider>
+          </OrderProvider>
         </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>

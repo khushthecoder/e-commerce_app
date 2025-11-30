@@ -1,10 +1,22 @@
-// src/constants/api.js
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-const host = Platform.OS === 'android' ? '10.201.94.24' : '127.0.0.1';
-const API_BASE_URL = `http://${host}:3000`;
+import Constants from 'expo-constants';
+
+const getApiUrl = () => {
+  const debuggerHost = Constants.expoConfig?.hostUri;
+  const localhost = debuggerHost?.split(':')[0];
+
+  if (localhost) {
+    return `http://${localhost}:3000`;
+  }
+
+  return 'http://127.0.0.1:3000';
+};
+
+export const API_BASE_URL = getApiUrl();
+console.log('API_BASE_URL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -29,6 +41,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.log("API Error:", error?.response?.status, error?.message);
     if (error.response?.status === 401) {
       AsyncStorage.removeItem('userToken');
     }
