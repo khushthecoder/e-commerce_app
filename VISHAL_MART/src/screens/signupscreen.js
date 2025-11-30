@@ -28,6 +28,9 @@ const SignupScreen = ({ navigation }) => {
         placeholderTextColor={colors.placeholder}
         value={name}
         onChangeText={setName}
+        autoCorrect={false}
+        autoComplete="off"
+        textContentType="none"
       />
       <TextInput
         style={styles.input}
