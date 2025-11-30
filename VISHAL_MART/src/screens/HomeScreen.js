@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Button, TextInput, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TextInput, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
 import { useAuth } from '../state/authContext';
 import ProductCard from '../components/product/Productcard';
+import { useTheme } from '../theme/ThemeContext';
+
+import { PRODUCT_IMAGES } from '../constants/productImages';
+
+
 
 const generateDummyProducts = () => {
   const products = [];
@@ -23,13 +28,19 @@ const generateDummyProducts = () => {
     const noun = nounList[i % nounList.length];
     const adj = adjectives[i % adjectives.length];
 
+    // Get curated image for the specific noun
+    const nounImages = PRODUCT_IMAGES[noun] || [];
+    const image = nounImages.length > 0
+      ? nounImages[i % nounImages.length]
+      : `https://loremflickr.com/600/600/${noun.replace(' ', ',')}?lock=${i}`;
+
     products.push({
       id: i,
       name: `${adj} ${noun}`,
       description: `Experience the best with our ${adj.toLowerCase()} ${noun.toLowerCase()}. Top quality ${category} item for your daily needs.`,
       price: Math.floor(Math.random() * 5000) + 499,
       stock: Math.floor(Math.random() * 195) + 5,
-      image: `https://source.unsplash.com/random/500x500/?product,item,${i}`,
+      image: image,
       category: category
     });
   }
@@ -37,6 +48,8 @@ const generateDummyProducts = () => {
 };
 
 const HomeScreen = ({ navigation }) => {
+  const { colors, styles } = useTheme();
+  const themedStyles = styles(stylesConfig);
   const [allProducts, setAllProducts] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,37 +103,46 @@ const HomeScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading products...</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Vishal Mart</Text>
-        <Button title="Logout" onPress={handleLogout} color="#FF6347" />
+    <SafeAreaView style={themedStyles.container} edges={['top']}>
+      <View style={themedStyles.header}>
+        <Text style={themedStyles.sectionTitle}>Vishal Mart</Text>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text style={themedStyles.logoutButton}>Logout</Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.searchContainer}>
+      <View style={themedStyles.searchContainer}>
         <TextInput
           placeholder="Search products..."
+          placeholderTextColor={colors.text}
           value={search}
           onChangeText={setSearch}
-          style={styles.searchInput}
+          style={themedStyles.searchInput}
         />
       </View>
 
-      <View style={styles.categoryContainer}>
+      <View style={themedStyles.categoryContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((cat) => (
             <TouchableOpacity
               key={cat}
-              style={[styles.categoryButton, selectedCategory === cat && styles.selectedCategoryButton]}
+              style={[
+                themedStyles.categoryButton,
+                selectedCategory === cat && themedStyles.categoryButtonActive
+              ]}
               onPress={() => setSelectedCategory(cat)}
             >
-              <Text style={[styles.categoryText, selectedCategory === cat && styles.selectedCategoryText]}>
+              <Text
+                style={[
+                  themedStyles.categoryText,
+                  selectedCategory === cat && themedStyles.categoryTextActive
+                ]}
+              >
                 {cat}
               </Text>
             </TouchableOpacity>
@@ -137,7 +159,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('ProductDetail', { product: item })}
           />
         )}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={themedStyles.productList}
         numColumns={2}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
@@ -147,39 +169,45 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const stylesConfig = (colors) => ({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: colors.border,
   },
-  title: {
-    fontSize: 24,
+  sectionTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    margin: 15,
+    color: colors.text,
   },
   searchContainer: {
+    flexDirection: 'row',
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
+    margin: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   searchInput: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: colors.border,
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: colors.light,
   },
   categoryContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.card,
     paddingVertical: 10,
     paddingHorizontal: 5,
     marginBottom: 5,
@@ -187,35 +215,42 @@ const styles = StyleSheet.create({
   categoryButton: {
     paddingHorizontal: 15,
     paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    borderRadius: 15,
     marginHorizontal: 5,
+    backgroundColor: colors.light,
   },
-  selectedCategoryButton: {
-    backgroundColor: '#007AFF',
+  categoryButtonActive: {
+    backgroundColor: colors.primary,
   },
   categoryText: {
-    color: '#333',
+    color: colors.text,
     fontWeight: '500',
+    opacity: 0.9,
   },
-  selectedCategoryText: {
-    color: '#fff',
+  selectedCat: {
+    color: colors.text,
     fontWeight: 'bold',
   },
-  list: {
-    paddingHorizontal: 5,
-    paddingVertical: 10,
+  productList: {
+    paddingHorizontal: 10,
+    backgroundColor: colors.background,
   },
-  center: {
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
-  loadingText: {
-    marginTop: 10,
+  errorText: {
+    color: colors.danger,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  logoutButton: {
+    color: colors.text,
     fontSize: 16,
-    color: '#555',
+    fontWeight: 'bold',
+    marginRight: 10,
   },
 });
 

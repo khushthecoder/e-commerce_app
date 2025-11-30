@@ -1,9 +1,10 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, StatusBar, Platform } from 'react-native';
+import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 
 import HomeScreen from './src/screens/HomeScreen';
 import CartScreen from './src/screens/CartScreen';
@@ -77,28 +78,52 @@ const AuthStack = () => {
 
 const AppNavigation = () => {
   const { userToken, isLoading } = useAuth();
+  const { colors, isDark } = useTheme();
+
+  const navigationTheme = {
+    ...(isDark ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.card,
+      text: colors.text,
+      border: colors.border,
+      notification: colors.primary,
+    },
+  };
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
-  return userToken ? <MainTabNavigator /> : <AuthStack />;
+  // Set the status bar style based on theme
+  StatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content');
+  if (Platform.OS === 'android') {
+    StatusBar.setBackgroundColor(colors.background);
+  }
+
+  return (
+    <NavigationContainer theme={navigationTheme}>
+      {userToken ? <MainTabNavigator /> : <AuthStack />}
+    </NavigationContainer>
+  );
 };
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <CartProvider>
-          <NavigationContainer>
+      <ThemeProvider>
+        <AuthProvider>
+          <CartProvider>
             <AppNavigation />
-          </NavigationContainer>
-        </CartProvider>
-      </AuthProvider>
+          </CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
