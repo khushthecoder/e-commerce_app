@@ -51,6 +51,11 @@ const createStyles = (colors) => ({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  imageContainer: {
+    backgroundColor: colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
   image: {
     width: '100%',
     height: 120,
@@ -75,7 +80,7 @@ const createStyles = (colors) => ({
   },
   description: {
     fontSize: 12,
-    color: colors.text,
+    color: colors.subText,
     opacity: 0.8,
     lineHeight: 16,
   },

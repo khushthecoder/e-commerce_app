@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useColorScheme, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const ThemeContext = createContext();
 
@@ -7,13 +8,7 @@ export const ThemeProvider = ({ children }) => {
   const colorScheme = useColorScheme();
   const [isDark, setIsDark] = useState(colorScheme === 'dark');
 
-  useEffect(() => {
-    setIsDark(colorScheme === 'dark');
-  }, [colorScheme]);
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-  };
 
   const themeColors = {
     light: {
@@ -29,20 +24,50 @@ export const ThemeProvider = ({ children }) => {
       info: '#17a2b8',
       light: '#f8f9fa',
       dark: '#343a40',
+      subText: '#666666',
+      inputBackground: '#f5f5f5',
+      placeholder: '#888888'
     },
     dark: {
-      background: '#121212',
-      card: '#1e1e1e',
-      text: '#ffffff',
+      background: '#000000',
+      card: '#111111',
+      text: '#FFFFFF',
+      subText: '#C7C7C7',
       border: '#333333',
-      primary: '#64b5f6',
+      primary: '#4DA3FF',
       secondary: '#90a4ae',
-      success: '#4caf50',
-      danger: '#f44336',
+      success: '#3ED46A',
+      danger: '#FF6B6B',
       warning: '#ffb74d',
       info: '#4dd0e1',
       light: '#2d2d2d',
-      dark: '#1a1a1a',
+      dark: '#0D0D0D',
+      inputBackground: '#1C1C1E',
+      placeholder: '#9A9A9A'
+    }
+  };
+
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await AsyncStorage.getItem('theme');
+        if (savedTheme !== null) {
+          setIsDark(savedTheme === 'dark');
+        }
+      } catch (error) {
+        console.error('Failed to load theme', error);
+      }
+    };
+    loadTheme();
+  }, []);
+
+  const toggleTheme = async () => {
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    try {
+      await AsyncStorage.setItem('theme', newTheme ? 'dark' : 'light');
+    } catch (error) {
+      console.error('Failed to save theme', error);
     }
   };
 
@@ -51,8 +76,6 @@ export const ThemeProvider = ({ children }) => {
     toggleTheme,
     colors: isDark ? themeColors.dark : themeColors.light,
   };
-
-  // Create a styles function that applies the current theme colors
   const createStyles = (styleObject) => {
     const themedStyles = styleObject(theme.colors);
     return StyleSheet.create(themedStyles);
