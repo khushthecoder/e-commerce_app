@@ -93,7 +93,7 @@ const OrderHistoryScreen = ({ navigation }) => {
   return (
     <Container>
       <View style={styles.header}>
-        <Text style={styles.title}>Aapke Pichle Orders</Text>
+        <Text style={styles.title}>Your Previous Orders</Text>
       </View>
       
       {orders.length === 0 ? (

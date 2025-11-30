@@ -15,6 +15,8 @@ import ProductDetailScreen from './src/screens/ProductDetailScreen';
 import CheckoutScreen from './src/screens/CheckoutScreen';
 import { AuthProvider, useAuth } from './src/state/authContext';
 import { CartProvider } from './src/state/cartContext';
+import OrderHistoryScreen from './src/screens/OrderHistoryScreen';
+import ShippingAddressScreen from './src/screens/ShippingAddressScreen';
 
 const Tab = createBottomTabNavigator();
 const AuthStackScreen = createStackNavigator();
@@ -41,12 +43,24 @@ const CartStackNavigator = () => {
   );
 };
 
+const ProfileStack = createStackNavigator();
+
+const ProfileStackNavigator = () => {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="OrderHistory" component={OrderHistoryScreen} options={{ title: 'Order History' }} />
+      <ProfileStack.Screen name="ShippingAddress" component={ShippingAddressScreen} options={{ title: 'Shipping Addresses' }} />
+    </ProfileStack.Navigator>
+  );
+};
+
 const MainTabNavigator = () => {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Home" component={HomeStackNavigator} />
       <Tab.Screen name="Cart" component={CartStackNavigator} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile" component={ProfileStackNavigator} />
     </Tab.Navigator>
   );
 };

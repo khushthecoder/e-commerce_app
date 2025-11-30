@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, Button, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import { useAuth } from '../state/authContext';
 import ProductCard from '../components/product/Productcard';
@@ -96,7 +97,7 @@ const HomeScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>Vishal Mart</Text>
         <Button title="Logout" onPress={handleLogout} color="#FF6347" />
@@ -142,7 +143,7 @@ const HomeScreen = ({ navigation }) => {
         maxToRenderPerBatch={10}
         windowSize={5}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
