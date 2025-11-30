@@ -1,7 +1,3 @@
-// This file is no longer needed as the theming functionality
-// has been moved directly into ThemeContext.js
-// You can now use useTheme() hook to access theme colors and styles
-
 export const createThemedStyles = (styles) => {
   return (colors) => {
     const themedStyles = {};
