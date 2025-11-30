@@ -3,9 +3,12 @@ import { View, Text, StyleSheet, ScrollView, Button, Alert, TouchableOpacity, Mo
 import Container from '../components/layout/container';
 import { addressService } from '../utils/addressService';
 import { useAuth } from '../state/authContext';
+import { useTheme } from '../theme/ThemeContext';
 
 const ShippingAddressScreen = ({ navigation }) => {
   const { user } = useAuth();
+  const { colors, createStyles } = useTheme();
+  const styles = createStyles(stylesConfig);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
