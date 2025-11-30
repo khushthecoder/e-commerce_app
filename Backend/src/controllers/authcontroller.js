@@ -1,4 +1,3 @@
-// backend/controllers/authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
@@ -7,8 +6,6 @@ const prisma = new PrismaClient();
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    
-    // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
@@ -16,11 +13,7 @@ const register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
-
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // Create user
     const user = await prisma.user.create({
       data: {
         name,
@@ -28,15 +21,11 @@ const register = async (req, res) => {
         password: hashedPassword
       }
     });
-
-    // Generate token
     const token = jwt.sign(
       { userId: user.id },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
-
-    // Return user and token
     res.status(201).json({
       token,
       user: {
@@ -54,8 +43,6 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Find user
     const user = await prisma.user.findUnique({
       where: { email }
     });
@@ -63,21 +50,15 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-
-    // Generate token
     const token = jwt.sign(
       { userId: user.id },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
-
-    // Return user and token
     res.json({
       token,
       user: {

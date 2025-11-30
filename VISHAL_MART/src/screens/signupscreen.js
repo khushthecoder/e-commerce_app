@@ -1,4 +1,3 @@
-// src/screens/SignupScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useAuth } from '../state/authContext';
