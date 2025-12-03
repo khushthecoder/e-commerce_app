@@ -1,4 +1,6 @@
 # Vishal Mart - E-Commerce App
+VIDEO:
+https://drive.google.com/file/d/1eJDerTGTm9_BiIrYa655RWW7JZhBHWc1/view
 
 A modern, feature-rich e-commerce mobile application built with React Native and Node.js, providing seamless shopping experience with secure online payments.
 
@@ -8,15 +10,36 @@ Vishal Mart is a comprehensive e-commerce solution that enables users to browse 
 
 ## Features
 
-- **User Authentication**: Secure login and registration system
-- **Product Catalog**: Browse through various product categories with detailed views
-- **Shopping Cart**: Add, remove, and manage items in cart
-- **Online Payments**: Secure payment integration with multiple payment options
-- **Order Management**: Track orders and view order history
-- **User Profile**: Manage personal information and preferences
-- **Product Search & Filter**: Find products quickly with search and filter options
-- **Wishlist**: Save favorite products for later
-- **Push Notifications**: Get updates on orders and promotions
+### User Authentication
+- **Secure Sign Up & Login**: Email and password-based authentication.
+- **Session Management**: JWT-based secure session handling.
+- **Password Security**: Industry-standard password hashing.
+
+### Product Browsing
+- **Home Screen**: Interactive product feed with infinite scroll simulation.
+- **Category Filtering**: Filter products by categories (Shoes, Electronics, Watches, Bags, Clothing, Accessories).
+- **Smart Search**: Real-time search functionality by product name or description.
+- **Product Details**: Rich product views with images, descriptions, pricing, and stock availability.
+
+### Shopping Cart
+- **Cart Management**: Seamlessly add items, adjust quantities, and remove products.
+- **Real-time Calculations**: Instant subtotal and grand total updates.
+- **Persistent State**: Cart contents are managed via global application state.
+
+### Checkout & Orders
+- **Address Management**: Full CRUD (Create, Read, Update, Delete) support for shipping addresses.
+- **Streamlined Checkout**: Easy-to-use checkout flow with "Cash on Delivery" support.
+- **Order History**: Comprehensive list of past orders with status tracking and dates.
+
+### User Profile
+- **Profile Management**: Update personal details including Name, Phone, and Address.
+- **Settings Dashboard**: Quick access to order history, saved addresses, and app settings.
+
+### UI/UX Experience
+- **Theme Support**: Fully functional **Dark Mode** and **Light Mode** with dynamic switching.
+- **Responsive Design**: Optimized layouts for various screen sizes.
+- **Offline Capability**: Robust dummy data generation ensures the app is testable even without a backend connection for products.
+- **Review System**: Interactive star rating and review submission system.
 
 ## Technology Stack
 
@@ -39,41 +62,34 @@ Vishal Mart is a comprehensive e-commerce solution that enables users to browse 
 - **Environment Variables** for secure configuration
 
 ## Project Structure
-VISHAL_MART/
-├── Backend/                 # Node.js backend server
-│   ├── node_modules/
-│   ├── prisma/              # Database schema and migrations
-│   ├── src/                 # Server source code
-│   ├── .env                 # Environment variables
-│   ├── package.json         # Server dependencies
-│   └── package-lock.json
-├── VISHAL_MART/             # React Native mobile app
-│   ├── .expo/
-│   ├── node_modules/
-│   ├── src/
-│   │   ├── assets/          # Images, fonts, and static files
-│   │   ├── components/      # Reusable UI components
-│   │   │   ├── common/      # Common components
-│   │   │   ├── layout/      # Layout components
-│   │   │   └── product/     # Product-related components
-│   │   ├── config/          # App configuration
-│   │   ├── constants/       # App constants
-│   │   ├── hooks/           # Custom React hooks
-│   │   ├── Navigation/      # Navigation setup
-│   │   ├── screens/         # App screens
-│   │   │   ├── auth/        # Authentication screens
-│   │   │   ├── cart/        # Shopping cart screens
-│   │   │   ├── checkout/    # Checkout process screens
-│   │   │   ├── home/        # Home and product listing
-│   │   │   └── profile/     # User profile screens
-│   │   ├── Services/        # API services
-│   │   └── state/           # State management
-│   ├── App.js               # Main app component
-│   ├── app.json             # Expo configuration
-│   ├── index.js             # App entry point
-│   └── package.json         # Mobile app dependencies
-└── README.md                # Project documentation
 
+```
+MAD_PRJOECT_SEM3/
+├── Backend/                 # Node.js/Express Backend
+│   ├── prisma/              # Database Schema & Seeds
+│   ├── src/
+│   │   ├── config/          # Configuration files
+│   │   ├── controllers/     # Route logic
+│   │   ├── middleware/      # Auth & Error middleware
+│   │   └── routes/          # API Routes
+│   ├── index.js             # Entry point
+│   └── package.json
+│
+├── VISHAL_MART/             # React Native Frontend
+│   ├── src/
+│   │   ├── assets/          # Images & Fonts
+│   │   ├── components/      # Reusable Components
+│   │   ├── constants/       # App Constants & Dummy Data
+│   │   ├── screens/         # App Screens (Home, Cart, etc.)
+│   │   ├── state/           # Context API (Auth, Cart, Order)
+│   │   ├── theme/           # Theme Configuration
+│   │   └── utils/           # Helper Functions
+│   ├── App.js               # Main App Component
+│   ├── app.json             # Expo Config
+│   └── package.json
+│
+└── README.md                # Project Documentation
+```
 ## Getting Started
 
 ### Prerequisites
@@ -89,38 +105,47 @@ VISHAL_MART/
 1. **Clone the repository**:
    ```bash
    git clone <repository-url>
-   cd VISHAL_MART
+   cd MAD_PRJOECT_SEM3
+   ```
+
+2. **Setup the Backend Server**:
+   ```bash
    cd Backend
-#Setup the backend server:
-npm install
+   npm install
 
-# Setup environment variables
-cp .env.example .env
-# Edit .env with your MySQL database credentials
+   # Setup environment variables
+   cp .env.example .env
+   # Edit .env with your MySQL database credentials
 
-# Setup database
-npx prisma generate
-npx prisma db push
+   # Setup database
+   npx prisma generate
+   npx prisma db push
 
-# Start backend server
-npm run dev
-#Setup the mobile app:
-cd VISHAL_MART
-npm install
+   # Start backend server
+   npm run dev
+   ```
 
-# Start Expo development server
-npm start
+3. **Setup the Mobile App**:
+   ```bash
+   # Open a new terminal or cd back to root
+   cd ../VISHAL_MART
+   npm install
 
-#Run on device/simulator:
-# iOS
-npm run ios
+   # Start Expo development server
+   npm start
+   ```
 
-# Android
-npm run android
+4. **Run on Device/Simulator**:
+   ```bash
+   # iOS
+   npm run ios
 
-# Web
-npm run web
+   # Android
+   npm run android
 
+   # Web
+   npm run web
+   ```
 
 ## Development Timeline
 
@@ -133,25 +158,25 @@ npm run web
 ## API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
+- `POST /users/register` - User registration
+- `POST /users/login` - User login
+- `GET /users/me` - Get current user profile
 
 ### Products
-- `GET /api/products` - Get all products
-- `GET /api/products/:id` - Get single product
-- `GET /api/products/category/:category` - Get products by category
+- `GET /products` - Get all products
+- `GET /products/:id` - Get single product details
 
 ### Cart
-- `GET /api/cart` - Get user cart
-- `POST /api/cart` - Add item to cart
-- `PUT /api/cart/:id` - Update cart item
-- `DELETE /api/cart/:id` - Remove item from cart
+- `GET /cart` - Get user cart
+- `POST /cart/add` - Add item to cart
+- `PUT /cart/item/:itemId` - Update cart item quantity
+- `DELETE /cart/item/:itemId` - Remove item from cart
+- `POST /cart/checkout` - Process checkout
 
 ### Orders
-- `POST /api/orders` - Create new order
-- `GET /api/orders` - Get user orders
-- `GET /api/orders/:id` - Get order details
+- `POST /orders` - Create new order
+- `GET /orders/history` - Get logged-in user's order history
+- `GET /orders/:id` - Get specific order details
 
 ## Future Enhancements
 
